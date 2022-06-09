@@ -21,8 +21,9 @@ void Game::Start()
     glViewport(0, 0, 1280, 720);
     glEnable(GL_DEPTH_TEST);
 
-    world.Initialize();
     renderer.AddRender("cube");
+    renderer.AddRender("floor");
+    world.Initialize(renderer);
 }
 
 void Game::Run()
@@ -34,7 +35,8 @@ void Game::Run()
         glfwPollEvents();
 
         world.Update();
-        
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         world.Render(renderer);
         
         glfwSwapBuffers(window);

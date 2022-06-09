@@ -25,7 +25,7 @@ project "Puzzle"
    libdirs { "D:/_Work/_Dev_Libs/glfw-3.3.6.bin.WIN64/lib-vc2022"}
 
    includedirs { "include", "D:/_Work/_Dev_Libs/glad/include", "D:/_Work/_Dev_Libs/glfw-3.3.6.bin.WIN64/include",
-                 "D:/_Work/_Dev_Libs/glm" }
+                 "D:/_Work/_Dev_Libs/glm", "D:/_Work/_Dev_Libs/stb" }
 
    filter "configurations:Debug"
       defines { "DEBUG" }

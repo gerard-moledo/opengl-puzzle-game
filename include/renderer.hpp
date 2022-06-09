@@ -1,11 +1,12 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include <vector>
+#include <unordered_map>
+#include <string>
+
 #include "glad/glad.h"
 #include "glm/glm.hpp"
-
-#include <vector>
-#include <string>
 
 struct BufferLayout
 {
@@ -24,23 +25,24 @@ struct BufferInfo
 
 struct Render
 {
+    Render();
     Render(BufferInfo info, GLuint p);
     
     GLuint vao;
     GLuint arrayBuffer;
     GLuint elementBuffer;
-    GLuint program;
+
+    GLuint texture;
     
+    GLuint program;
     GLint transformLocation;
     GLint colorLocation;
     GLint textureLocation;
-
-    GLuint textureUnit;
 };
 
 struct Renderer
 {
-    std::vector<Render> renders;
+    std::unordered_map<std::string, Render> renders;
     
     void AddRender(std::string type);
     void Draw(glm::mat4 transform, glm::mat4 model);

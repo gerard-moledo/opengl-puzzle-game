@@ -1,11 +1,15 @@
 #include "renderer.hpp"
 
-#include <unordered_map>
 #include <fstream>
-#include <sstream>
 
 #include "glm/gtc/type_ptr.hpp"
 #include "glm/gtx/string_cast.hpp"
+#include "stb_image.h"
+
+Render::Render()
+{
+    
+}
 
 Render::Render(BufferInfo info, GLuint p)
 {
@@ -32,8 +36,28 @@ Render::Render(BufferInfo info, GLuint p)
     
     glBindVertexArray(0);
 
-    
     program = p;
+    if (glGetAttribLocation(program, "aTexCoord") != -1)
+    {
+        int width, height, channelCount;
+        unsigned char* data = stbi_load("Assets/Tile.png", &width, &height, &channelCount, 0);
+        if (data)
+        {
+            glGenTextures(1, &texture);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texture);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        stbi_image_free(data);
+    }
+    
     transformLocation = glGetUniformLocation(program, "transform");
     colorLocation = glGetUniformLocation(program, "color");
     textureLocation = glGetUniformLocation(program, "textureSampler");
@@ -49,25 +73,13 @@ void Renderer::AddRender(std::string type)
     GLuint program = CreateShader(type);
     Render render = Render(data, program);
 
-    renders.emplace_back(render);
+    renders[type] = render;
 }
 
 void Renderer::Draw(glm::mat4 transform, glm::mat4 model)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    for (Render& render : renders)
-    {
-        glBindVertexArray(render.vao);
-        glUseProgram(render.program);
 
-        glm::mat4 renderTransform = transform * model;
-        glUniformMatrix4fv(render.transformLocation, 1, GL_FALSE, glm::value_ptr(transform * model));
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
-        glUseProgram(0);
-        glBindVertexArray(0);
-    }
 }
 
 BufferInfo Renderer::ExtractDataFromFile(std::string type)
