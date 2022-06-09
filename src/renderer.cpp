@@ -54,6 +54,8 @@ void Renderer::AddRender(std::string type)
 
 void Renderer::Draw(glm::mat4 transform, glm::mat4 model)
 {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
     for (Render& render : renders)
     {
         glBindVertexArray(render.vao);

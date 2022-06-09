@@ -8,6 +8,8 @@ void Game::Initialize()
 
     window = glfwCreateWindow(1280, 720, "Puzzle", NULL, NULL);
 
+    glfwSetWindowPos(window, 640, 320);
+    
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
@@ -32,9 +34,7 @@ void Game::Run()
         glfwPollEvents();
 
         world.Update();
-
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
         world.Render(renderer);
         
         glfwSwapBuffers(window);
