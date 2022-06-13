@@ -25,7 +25,6 @@ struct BufferInfo
 
 struct Render
 {
-    Render();
     Render(BufferInfo info, GLuint p);
     
     GLuint vao;
@@ -33,7 +32,8 @@ struct Render
     GLuint elementBuffer;
 
     GLuint texture;
-    
+
+    BufferInfo bufferInfo;
     GLuint program;
     GLint transformLocation;
     GLint colorLocation;
@@ -42,16 +42,18 @@ struct Render
 
 struct Renderer
 {
-    std::unordered_map<std::string, Render> renders;
+    Renderer();
+    
+    Render renderCube;
+    Render renderFloor;
     
     void AddRender(std::string type);
-    void Draw(glm::mat4 transform, glm::mat4 model);
+
+    void BindState(Render& render);
+    void DrawBuffer(Render& render);
 
 private:
     BufferInfo ExtractDataFromFile(std::string type);
-    
-    GLuint CreateShader(std::string filename);
-    void ReadShaderFromFile(std::string& shader, std::string file);
 };
 
 #endif

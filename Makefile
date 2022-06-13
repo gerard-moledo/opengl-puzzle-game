@@ -32,7 +32,7 @@ objs/world.o : world.cpp world.hpp
 objs/renderer.o : renderer.cpp renderer.hpp
 	g++ -o $@ -c $< $(CXXFLAGS)
 
-objs/data.o : data.cpp data.hpp
+objs/system.o : system.cpp system.hpp
 	g++ -o $@ -c $< $(CXXFLAGS)
 
 cleanrun :

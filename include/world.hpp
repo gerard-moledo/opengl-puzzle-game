@@ -6,19 +6,33 @@
 
 #include "renderer.hpp"
 
-struct Entity
+struct Floor
 {
-    Entity(Renderer& renderer, std::string renderType);
+    Floor(Render& render);
 
     Render& render;
     glm::mat4 model;
+    
+    void Draw(Renderer& renderer, glm::mat4 worldTransform);
+};
 
-    void Draw(glm::mat4 renderTransform);
+struct Cube
+{
+    Cube(Render& render);
+
+    Render& render;
+    glm::mat4 model;
+    glm::vec3 color;
+    
+    void Draw(Renderer& renderer, glm::mat4 worldTransform);
 };
 
 struct World
 {
-    std::vector<Entity> entities;
+    World(Renderer& renderer);
+    
+    Floor floor;
+    std::vector<Cube> cubes;
     
     glm::mat4 projection;
     glm::mat4 view;

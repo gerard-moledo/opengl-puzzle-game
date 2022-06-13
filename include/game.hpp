@@ -9,7 +9,7 @@
 
 struct Game
 {
-    GLFWwindow* window;
+    Game();
 
     Renderer renderer;
     World world;

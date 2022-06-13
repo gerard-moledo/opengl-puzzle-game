@@ -1,15 +1,17 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#include "system.hpp"
 #include "game.hpp"
 
 int main()
 {
-    Game game;
+    System::Initialize();
     
-    game.Initialize();
+    Game game = Game();
     game.Run();
-    game.Quit();
+
+    System::Quit();
     
     return 0;
 }

@@ -6,10 +6,7 @@
 #include "glm/gtx/string_cast.hpp"
 #include "stb_image.h"
 
-Render::Render()
-{
-    
-}
+#include "system.hpp"
 
 Render::Render(BufferInfo info, GLuint p)
 {
@@ -20,9 +17,12 @@ Render::Render(BufferInfo info, GLuint p)
     glBindBuffer(GL_ARRAY_BUFFER, arrayBuffer);
     glBufferData(GL_ARRAY_BUFFER, info.arrayBufferData.size() * sizeof(float), info.arrayBufferData.data(), GL_STATIC_DRAW);
 
-    glGenBuffers(1, &elementBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, info.elementBufferData.size() * sizeof(unsigned int), info.elementBufferData.data(), GL_STATIC_DRAW);
+    if (info.elementBufferData.size() > 0)
+    {
+        glGenBuffers(1, &elementBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, info.elementBufferData.size() * sizeof(unsigned int), info.elementBufferData.data(), GL_STATIC_DRAW); 
+    }
 
     for (BufferLayout layout : info.layouts)
     {
@@ -36,7 +36,9 @@ Render::Render(BufferInfo info, GLuint p)
     
     glBindVertexArray(0);
 
+    bufferInfo = info;
     program = p;
+    
     if (glGetAttribLocation(program, "aTexCoord") != -1)
     {
         int width, height, channelCount;
@@ -67,25 +69,38 @@ Render::Render(BufferInfo info, GLuint p)
 // RENDERER
 //===========================================
 
-void Renderer::AddRender(std::string type)
+Renderer::Renderer() :
+    renderFloor(ExtractDataFromFile("floor"), System::programMap["floor"]),
+    renderCube(ExtractDataFromFile("cube"), System::programMap["cube"])
 {
-    BufferInfo data = ExtractDataFromFile(type);
-    GLuint program = CreateShader(type);
-    Render render = Render(data, program);
-
-    renders[type] = render;
+    
 }
 
-void Renderer::Draw(glm::mat4 transform, glm::mat4 model)
+void Renderer::BindState(Render& render)
 {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindVertexArray(render.vao);
+    glUseProgram(render.program);
+}
 
+void Renderer::DrawBuffer(Render& render)
+{
+    GLint buffer;
+    glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &buffer);
+    
+    if (buffer == 0)
+    {
+        glDrawArrays(GL_TRIANGLES, 0, render.bufferInfo.arrayBufferData.size() / (render.bufferInfo.layouts[0].stride / sizeof(float)));
+    }
+    else
+    {
+        glDrawElements(GL_TRIANGLES, render.bufferInfo.elementBufferData.size(), GL_UNSIGNED_INT, 0);
+    }
 }
 
 BufferInfo Renderer::ExtractDataFromFile(std::string type)
 {
     BufferInfo data;
-    
+
     std::ifstream filestream {};
     filestream.open(type + ".data");
 
@@ -94,10 +109,10 @@ BufferInfo Renderer::ExtractDataFromFile(std::string type)
     int size;
     float arrayBufferDatum;
     unsigned int elementBufferDatum;
-    
+
     while (filestream.peek() != EOF)
     {
-        filestream >> bufferType; 
+        filestream >> bufferType;
 
         if (bufferType[0] == 'A')
         {
@@ -121,7 +136,7 @@ BufferInfo Renderer::ExtractDataFromFile(std::string type)
 
                 offset += layout.size;
             }
-            
+
             filestream.clear();
             filestream.get();
 
@@ -142,54 +157,4 @@ BufferInfo Renderer::ExtractDataFromFile(std::string type)
     }
 
     return data;
-}
-
-GLuint Renderer::CreateShader(std::string filename)
-{
-    std::string vertexSource {};
-    std::string fragmentSource {};
-
-    ReadShaderFromFile(vertexSource, filename + std::string(".vs"));
-    ReadShaderFromFile(fragmentSource, filename + std::string(".fs"));
-
-    const char* vertexString = vertexSource.c_str();
-    const char* fragmentString = fragmentSource.c_str();
-
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexString, NULL);
-    glCompileShader(vertexShader);
-
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentString, NULL);
-    glCompileShader(fragmentShader);
-
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragmentShader);
-    glLinkProgram(program);
-
-    GLchar info[200];
-    glGetProgramInfoLog(program, 200, nullptr, info);
-    printf("%s", info);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return program;
-}
-
-void Renderer::ReadShaderFromFile(std::string& shader, std::string file)
-{
-    shader.clear();
-
-    std::ifstream filestream {};
-    filestream.open(file);
-
-    std::string line {};
-    while (std::getline(filestream, line))
-    {
-        shader.append(line + "\n");
-    }
-
-    filestream.close();
 }

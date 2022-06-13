@@ -3,37 +3,56 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-Entity::Entity(Renderer& renderer, std::string renderType) :
-    render(renderer.renders[renderType]),
+Floor::Floor(Render& render) :
+    render(render),
     model(glm::mat4(1.0f))
+{
+    model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
+}
+
+void Floor::Draw(Renderer& renderer, glm::mat4 worldTransform)
+{
+    renderer.BindState(render);
+
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(render.textureLocation, 0);
+    glUniformMatrix4fv(render.transformLocation, 1, GL_FALSE, glm::value_ptr(worldTransform * model));
+    
+    renderer.DrawBuffer(render);
+}
+
+Cube::Cube(Render& render) :
+    render(render),
+    model(glm::mat4(1.0f)),
+    color(glm::vec3(1.0f))
 {
     
 }
 
-void Entity::Draw(glm::mat4 renderTransform)
+void Cube::Draw(Renderer& renderer, glm::mat4 worldTransform)
 {
-    glBindVertexArray(render.vao);
-    glUseProgram(render.program);
+    renderer.BindState(render);
 
-    glActiveTexture(GL_TEXTURE0);
-    glUniform1i(render.textureLocation, 0);
-    glUniformMatrix4fv(render.transformLocation, 1, GL_FALSE, glm::value_ptr(renderTransform * model));
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glUniformMatrix4fv(render.transformLocation, 1, GL_FALSE, glm::value_ptr(worldTransform * model));
+    glUniform4f(render.colorLocation, color.r, color.g, color.b, 1.0f);
 
-    glUseProgram(0);
-    glBindVertexArray(0);
+    renderer.DrawBuffer(render);
+}
+
+World::World(Renderer& renderer) :
+    floor(renderer.renderFloor),
+    cubes(),
+    projection(glm::mat4(1.0f)),
+    view(glm::mat4(1.0f))
+{
+    projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
+    view = glm::lookAt(glm::vec3(0.0f, 25.0f, 15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void World::Initialize(Renderer& renderer)
 {
-    projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
-
-    view = glm::mat4(1.0f);
-    view = glm::lookAt(glm::vec3(0.0f, 10.0f, 15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    Entity floor = Entity(renderer, "floor");
-    entities.emplace_back(floor);
+    Cube cube = Cube(renderer.renderCube);
+    cubes.emplace_back(cube);
 }
 
 void World::Update()
@@ -46,8 +65,9 @@ void World::Render(Renderer& renderer)
     glm::mat4 renderTransform = glm::mat4(1.0f);
     renderTransform = projection * view * renderTransform;
 
-    for (Entity entity : entities)
+    floor.Draw(renderer, renderTransform);
+    for (Cube cube : cubes)
     {
-        entity.Draw(renderTransform);
+        cube.Draw(renderer, renderTransform);
     }
 }

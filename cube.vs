@@ -19,11 +19,9 @@ void main()
 {
     gl_Position = transform * vec4(aPos, 1.0);
 
-    vColor = vec4(aColor, 1.0);
-
-    // vColor = vec4(color.xyz * map(aPos.y, -1, 1, 0.25, 0.92), 1.0);
-    // if (color.a < 1.0)
-    //     vColor.a = color.a;
+    vColor = vec4(color.xyz * map(aPos.y, -1, 1, 0.25, 0.92), 1.0);
+    if (color.a < 1.0)
+        vColor.a = color.a;
 
     /*vTexCoord = aTexCoord;*/
 }

@@ -16,7 +16,8 @@ project "Puzzle"
 
    prebuildcommands { "copy ..\\..\\..\\*.data *.data",
                       "copy ..\\..\\..\\*.vs *.vs",
-                      "copy ..\\..\\..\\*.fs *.fs" }
+                      "copy ..\\..\\..\\*.fs *.fs",
+                      "copy ..\\..\\..\\Assets\\*.png Assets\\*.png" }
    
    files { "include/*.hpp", "src/*.cpp", "D:/_Work/_Dev_Libs/glad/src/glad.c", "*.vs", "*.fs", "*.data" }
 
