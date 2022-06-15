@@ -4,43 +4,10 @@
 #include "glad/glad.h"
 #include "glfw/glfw3.h"
 
-#include <vector>
 #include <string>
 #include <unordered_map>
 
-struct BufferLayout
-{
-    int location;
-    GLint size;
-    int stride;
-    int offset;
-};
-
-struct BufferInfo
-{
-    std::vector<float> arrayBufferData;
-    std::vector<unsigned int> elementBufferData;
-    std::vector<BufferLayout> layouts;
-};
-
-struct Render
-{
-    Render();
-    Render(BufferInfo info, GLuint p);
-    ~Render();
-
-    GLuint vao;
-    GLuint arrayBuffer;
-    GLuint elementBuffer;
-
-    GLuint texture;
-
-    BufferInfo bufferInfo;
-    GLuint program;
-    GLint transformLocation;
-    GLint colorLocation;
-    GLint textureLocation;
-};
+#include "render.hpp"
 
 namespace System
 {
