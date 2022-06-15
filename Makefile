@@ -17,24 +17,15 @@ CXXFLAGS = $(INCLUDES) $(DEBUG)
 program : $(OBJS)
 	g++ -o program $(OBJS) $(LIBRARIES) $(LINKS) 
 
-objs/main.o : main.cpp game.hpp
-	g++ -o $@ -c $< $(CXXFLAGS)
-
 objs/glad.o : $(DEV)\\glad\\src\\glad.c
 	g++ -o $@ -c $(DEV)\\glad\\src\\glad.c $(CXXFLAGS)
 
-objs/game.o : game.cpp game.hpp
+objs/main.o : main.cpp game.hpp
 	g++ -o $@ -c $< $(CXXFLAGS)
 
-objs/world.o : world.cpp world.hpp 
+objs/%.o : %.cpp %.hpp
 	g++ -o $@ -c $< $(CXXFLAGS)
-
-objs/renderer.o : renderer.cpp renderer.hpp
-	g++ -o $@ -c $< $(CXXFLAGS)
-
-objs/system.o : system.cpp system.hpp
-	g++ -o $@ -c $< $(CXXFLAGS)
-
+		
 cleanrun :
 	$(MAKE) clean 
 	$(MAKE)

@@ -5,34 +5,16 @@
 #include <string>
 
 #include "renderer.hpp"
-
-struct Floor
-{
-    Floor(Render& render);
-
-    Render& render;
-    glm::mat4 model;
-    
-    void Draw(Renderer& renderer, glm::mat4 worldTransform);
-};
-
-struct Cube
-{
-    Cube(Render& render);
-
-    Render& render;
-    glm::mat4 model;
-    glm::vec3 color;
-    
-    void Draw(Renderer& renderer, glm::mat4 worldTransform);
-};
+#include "models.hpp"
+#include "player.hpp"
 
 struct World
 {
     World(Renderer& renderer);
     
-    Floor floor;
-    std::vector<Cube> cubes;
+    FloorModel floor;
+    Player player;
+    std::vector<CubeModel> cubes;
     
     glm::mat4 projection;
     glm::mat4 view;

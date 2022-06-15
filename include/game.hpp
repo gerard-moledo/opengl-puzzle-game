@@ -14,7 +14,6 @@ struct Game
     Renderer renderer;
     World world;
     
-    void Initialize();
     void Run();
     void Quit();
 
