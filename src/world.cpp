@@ -6,7 +6,7 @@
 World::World(Renderer& renderer) :
     floor(renderer),
     player(renderer),
-    cubes(),
+    cubes(0, CubeModel(renderer)),
     projection(glm::mat4(1.0f)),
     view(glm::mat4(1.0f))
 {
@@ -21,7 +21,7 @@ void World::Initialize(Renderer& renderer)
 
 void World::Update()
 {
-    
+
 }
 
 void World::Render(Renderer& renderer)
