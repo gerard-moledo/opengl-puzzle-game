@@ -19,12 +19,12 @@ void World::Initialize(Renderer& renderer)
 
 }
 
-void World::Update()
+void World::Update(float dt)
 {
-
+    player.Update(dt);
 }
 
-void World::Render(Renderer& renderer)
+void World::Render()
 {
     glm::mat4 renderTransform = glm::mat4(1.0f);
     renderTransform = projection * view * renderTransform;

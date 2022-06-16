@@ -16,9 +16,11 @@ struct Player
     Vector2i currentPos;
     Vector2i targetPos;
 
+    float tMove = 0.0f;
+    
     CubeModel cube;
 
-    void Update();
+    void Update(float dt);
     void Draw(glm::mat4 renderTransform);
 
 private:

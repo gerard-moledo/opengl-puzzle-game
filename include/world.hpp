@@ -20,8 +20,8 @@ struct World
     glm::mat4 view;
     
     void Initialize(Renderer& renderer);
-    void Update();
-    void Render(Renderer& renderer);
+    void Update(float dt);
+    void Render();
 };
 
 #endif
