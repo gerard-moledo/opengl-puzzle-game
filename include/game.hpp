@@ -13,7 +13,11 @@ struct Game
 
     Renderer renderer;
     World world;
-    
+
+    float tPrev = 0.0f;
+    float stackedTime = 0.0f;
+    float timestep = 0.02f;
+
     void Run();
     void Quit();
 

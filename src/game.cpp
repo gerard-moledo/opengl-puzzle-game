@@ -25,12 +25,22 @@ void Game::Run()
 
     while (!glfwWindowShouldClose(System::window))
     {
+        float tCurrent = (float)glfwGetTime();
+        float dt = tCurrent - tPrev;
+        tPrev = tCurrent;
+        stackedTime += dt;
+
         glfwPollEvents();
 
-        world.Update();
+        while (stackedTime > timestep)
+        {
+            stackedTime -= timestep;
+            
+            world.Update(timestep);
+        }
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        world.Render(renderer);
+        world.Render();
         
         glfwSwapBuffers(System::window);
     }
