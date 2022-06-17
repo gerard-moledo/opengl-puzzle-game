@@ -24,13 +24,15 @@ void World::Update(float dt)
     player.Update(dt);
 }
 
-void World::Render()
+void World::Render(float lag)
 {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
     glm::mat4 renderTransform = glm::mat4(1.0f);
     renderTransform = projection * view * renderTransform;
 
     floor.Draw(renderTransform);
-    player.Draw(renderTransform);
+    player.Draw(renderTransform, lag);
     for (CubeModel cube : cubes)
     {
         cube.Draw(renderTransform);

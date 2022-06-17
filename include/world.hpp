@@ -21,7 +21,7 @@ struct World
     
     void Initialize(Renderer& renderer);
     void Update(float dt);
-    void Render();
+    void Render(float lag);
 };
 
 #endif
