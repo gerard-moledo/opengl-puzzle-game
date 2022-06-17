@@ -14,10 +14,10 @@ project "Puzzle"
    targetdir "%{prj.location}/%{cfg.buildcfg}_%{cfg.platform}"
    targetname "program_vs2022"
 
-   prebuildcommands { "copy ..\\..\\..\\*.data *.data",
-                      "copy ..\\..\\..\\*.vs *.vs",
-                      "copy ..\\..\\..\\*.fs *.fs",
-                      "copy ..\\..\\..\\Assets\\*.png Assets\\*.png" }
+   prebuildcommands { "copy /y ..\\..\\..\\*.data *.data",
+                      "copy /y ..\\..\\..\\*.vs *.vs",
+                      "copy /y ..\\..\\..\\*.fs *.fs",
+                      "copy /y ..\\..\\..\\Assets\\*.png Assets\\*.png" }
    
    files { "include/*.hpp", "src/*.cpp", "D:/_Work/_Dev_Libs/glad/src/glad.c", "*.vs", "*.fs", "*.data" }
 
