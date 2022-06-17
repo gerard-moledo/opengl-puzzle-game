@@ -29,9 +29,11 @@ void Game::Run()
         float dt = tCurrent - tPrev;
         tPrev = tCurrent;
         stackedTime += dt;
-
+        
+        CalculateFramerate(dt);
+        
         glfwPollEvents();
-
+        
         while (stackedTime > timestep)
         {
             stackedTime -= timestep;
@@ -39,10 +41,22 @@ void Game::Run()
             world.Update(timestep);
         }
 
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        world.Render();
+        float lag = stackedTime / timestep;
+        world.Render(lag);
         
         glfwSwapBuffers(System::window);
+    }
+}
+
+Game::CalculateFramerate(float dt)
+{
+    fpsTime += dt;
+    frames++;
+    if (fpsTime > 1.0f)
+    {
+        fpsTime -= 1.0f;
+        printf("%d\n", frames);
+        frames = 0;
     }
 }
 
