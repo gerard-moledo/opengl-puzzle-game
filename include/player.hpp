@@ -6,25 +6,31 @@
 #include "models.hpp"
 #include "utils.hpp"
 
-enum class State { idle, moving };
+constexpr float SPEED = 15;
 
 struct Player
 {
     Player(Renderer& renderer);
 
-    State state = State::idle;
-    Vector2i currentPos;
-    Vector2i targetPos;
+    glm::vec3 worldPosPrev { 0.0f, 0.0f, 0.0f };
+    glm::vec3 worldPos { 0.0f, 0.0f, 0.0f };
+    
+    Vector2i currentCell { 0, 0 };
+    Vector2i targetCell { 0, 0 };
+    Vector2i direction { 0, 0 };
 
     float tMove = 0.0f;
+    bool accelerating = false;
     
     CubeModel cube;
 
     void Update(float dt);
-    void Draw(glm::mat4 renderTransform);
+    void Draw(glm::mat4 renderTransform, float lag);
 
 private:
-    void UpdateModel();
+    void ReceiveInput();
+    void CheckState(bool done);
+    bool Move(float dt);
 };
 
 #endif
