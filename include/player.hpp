@@ -3,6 +3,7 @@
 
 #include "glm/glm.hpp"
 
+#include "block.hpp"
 #include "models.hpp"
 #include "utils.hpp"
 
@@ -24,13 +25,14 @@ struct Player
     
     CubeModel cube;
 
-    void Update(float dt);
+    void Update(float dt, BlockStates states);
     void Draw(glm::mat4 renderTransform, float lag);
 
 private:
     void ReceiveInput();
-    void CheckState(bool done);
+    void CheckState(bool done, BlockStates state);
     bool Move(float dt);
+    bool MoveValid(Vector2i cell, BlockStates state);
 };
 
 #endif
