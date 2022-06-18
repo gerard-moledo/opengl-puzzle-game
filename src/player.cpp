@@ -8,7 +8,7 @@
 Player::Player(Renderer& renderer) :
     cube(renderer)
 {
-    
+    cube.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
 void Player::Update(float dt)
