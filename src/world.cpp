@@ -6,7 +6,7 @@
 World::World(Renderer& renderer) :
     floor(renderer),
     player(renderer),
-    cubes(0, CubeModel(renderer)),
+    blocks(1, Block(renderer, { 2, 2 })),
     projection(glm::mat4(1.0f)),
     view(glm::mat4(1.0f))
 {
@@ -33,8 +33,8 @@ void World::Render(float lag)
 
     floor.Draw(renderTransform);
     player.Draw(renderTransform, lag);
-    for (CubeModel cube : cubes)
+    for (Block& block : blocks)
     {
-        cube.Draw(renderTransform);
+        block.Draw(renderTransform, lag);
     }
 }

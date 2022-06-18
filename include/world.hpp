@@ -7,6 +7,7 @@
 #include "renderer.hpp"
 #include "models.hpp"
 #include "player.hpp"
+#include "block.hpp"
 
 struct World
 {
@@ -14,7 +15,7 @@ struct World
     
     FloorModel floor;
     Player player;
-    std::vector<CubeModel> cubes;
+    std::vector<Block> blocks;
     
     glm::mat4 projection;
     glm::mat4 view;
