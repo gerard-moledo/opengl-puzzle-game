@@ -48,7 +48,7 @@ void Game::Run()
     }
 }
 
-Game::CalculateFramerate(float dt)
+void Game::CalculateFramerate(float dt)
 {
     fpsTime += dt;
     frames++;
