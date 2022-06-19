@@ -2,15 +2,27 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
-Block::Block(Renderer& renderer, Vector2i cell) :
+Block::Block(Renderer& renderer, BlockType type, Vector2i cell) :
     cube(renderer),
     currentCell(cell),
-    targetCell(cell)
+    targetCell(cell),
+    type(type)
 {
     worldPosPrev = glm::vec3(cell.x, 0.0f, cell.y);
     worldPos = worldPosPrev;
 
-    cube.color = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
+    switch (type)
+    {
+        case BlockType::wall:
+            cube.color = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
+            break;
+        case BlockType::block:
+            cube.color = glm::vec4(0.588f, 0.294f, 0.0f, 1.0f);
+            break;
+        default:
+            cube.color = glm::vec4(1.0f);
+            break;
+    }
 }
 
 void Block::Update(float dt)

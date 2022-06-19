@@ -14,7 +14,7 @@ typedef std::vector<BlockState> BlockStates;
 
 struct Block
 {
-    Block(Renderer& renderer, Vector2i cell);
+    Block(Renderer& renderer, BlockType type, Vector2i cell);
 
     Vector2i currentCell;
     Vector2i targetCell;
@@ -25,7 +25,7 @@ struct Block
     
     float tMove = 0.0f;
 
-    BlockType type = BlockType::wall;
+    BlockType type;
     
     CubeModel cube;
 

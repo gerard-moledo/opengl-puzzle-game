@@ -6,7 +6,7 @@
 World::World(Renderer& renderer) :
     floor(renderer),
     player(renderer),
-    blocks(0, Block(renderer, { 0, 0 })),
+    blocks(0, Block(renderer, BlockType::goal, { 0, 0 })),
     projection(glm::mat4(1.0f)),
     view(glm::mat4(1.0f))
 {
@@ -16,8 +16,8 @@ World::World(Renderer& renderer) :
 
 void World::Initialize(Renderer& renderer)
 {
-    blocks.emplace_back(Block(renderer, { 5, 2 }));
-    blocks.emplace_back(Block(renderer, { -5, 0 }));
+    blocks.emplace_back(Block(renderer, BlockType::wall, { 5, 2 }));
+    blocks.emplace_back(Block(renderer, BlockType::block, { -5, 0 }));
 }
 
 void World::Update(float dt)
