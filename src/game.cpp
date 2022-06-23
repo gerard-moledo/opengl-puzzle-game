@@ -15,8 +15,11 @@ void Game::Start()
 {
     glViewport(0, 0, 1280, 720);
     glEnable(GL_DEPTH_TEST);
-
-    world.Initialize(renderer);
+    glEnable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    world.Initialize();
 }
 
 void Game::Run()

@@ -7,7 +7,7 @@
 #include "renderer.hpp"
 #include "utils.hpp"
 
-enum class BlockType { wall, block, goal };
+enum class BlockType { block, wall, goal };
 
 struct Block
 {

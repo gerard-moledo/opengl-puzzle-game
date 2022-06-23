@@ -29,7 +29,7 @@ struct World
 
     glm::vec3 GetMouseRay(float mouseX, float mouseY);
     
-    void Initialize(Renderer& renderer);
+    void Initialize();
     void Update(float dt);
     void Render(float lag);
 

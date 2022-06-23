@@ -3,6 +3,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+#include <algorithm>
+
 void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
 {
     World* world = (World*)glfwGetWindowUserPointer(window);
@@ -23,7 +25,32 @@ void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
 
         if (button == GLFW_MOUSE_BUTTON_LEFT)
         {
-            world->blocks.emplace_back(Block { world->renderer, BlockType::block, hitGrid });
+            bool occupied = false;
+            for (Block& block : world->blocks)
+            {
+                if (block.currentCell == hitGrid)
+                {
+                    block.type = (BlockType) ( ((int) block.type + 1) % 3);
+
+                    occupied = true;
+                }
+            }
+
+            if (!occupied)
+            {
+                world->blocks.emplace_back(Block { world->renderer, BlockType::block, hitGrid });
+            }
+        }
+        
+        if (button == GLFW_MOUSE_BUTTON_RIGHT)
+        {
+            auto begin = world->blocks.begin();
+            auto end = world->blocks.end();
+            world->blocks.erase(
+                std::remove_if(begin, end, [&](Block& block) {
+                    return block.currentCell == hitGrid;
+                }), end
+            );
         }
     }
 }
@@ -40,7 +67,7 @@ World::World(Renderer& renderer) :
     view = glm::lookAt(glm::vec3(0.0f, 25.0f, 15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
-void World::Initialize(Renderer& renderer)
+void World::Initialize()
 {
     glfwSetWindowUserPointer(System::window, this);
     glfwSetMouseButtonCallback(System::window, glfwMouseCallback);
@@ -69,6 +96,8 @@ void World::ModifyState()
         }
         for (Block& block : blocks)
         {
+            if (block.type == BlockType::goal) continue;
+            
             if (player.currentCell + player.direction == block.currentCell)
             {
                 if (player.state == State::premove)
@@ -109,6 +138,8 @@ void World::ModifyState()
             
             for (Block& blockChecked : blocks)
             {
+                if (blockChecked.type == BlockType::goal) continue;
+                
                 if (blockActive.currentCell + blockActive.direction == blockChecked.currentCell)
                 {
                     blockActive.state = State::idle;
