@@ -1,6 +1,8 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include "glm/gtx/polar_coordinates.hpp"
+
 constexpr float SPEED = 35;
 
 enum class State { idle, premove, moving, postmove };
@@ -34,5 +36,10 @@ struct Vector2i
     }
     
 };
+
+inline glm::vec3 PolarToRect(glm::vec3 polar)
+{
+    return glm::euclidean(glm::vec2(polar.y, polar.x)) * polar.z;
+}
 
 #endif
