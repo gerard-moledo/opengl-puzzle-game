@@ -18,8 +18,8 @@ struct World
 {
     World(Renderer& renderer);
 
-    int width = 9;
-    int height = 9;
+    int width = 7;
+    int height = 7;
     
     FloorModel floor;
     Player player;
@@ -27,10 +27,12 @@ struct World
     
     glm::mat4 projection;
     glm::mat4 view;
-
+    glm::vec3 eyePolar;
+    
     Renderer& renderer;
 
     glm::vec3 GetMouseRay(float mouseX, float mouseY);
+    void Resize(int newWidth, int newHeight);
     
     void Initialize();
     void Update(float dt);

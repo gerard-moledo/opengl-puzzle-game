@@ -74,26 +74,64 @@ void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
+void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    World* world = (World*) glfwGetWindowUserPointer(window);
+
+    Vector2i resize = Vector2i { 0, 0 };
+    
+    if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)   resize.x = -2;
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)  resize.x =  2;
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS)     resize.y =  2;
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)   resize.y = -2;
+
+    if (resize != Vector2i { 0, 0 })
+    {
+        world->Resize(world->width + resize.x, world->height + resize.y);
+    }
+}
+
 World::World(Renderer& renderer) :
     renderer(renderer),
     floor(renderer),
     player(renderer),
     blocks(0, Block(renderer, BlockType::goal, { 0, 0 })),
     projection(glm::mat4(1.0f)),
-    view(glm::mat4(1.0f))
+    view(glm::mat4(1.0f)),
+    eyePolar(glm::vec3(0.0f))
 {
-    projection = glm::perspective(glm::radians(45.0f), 1280.0f / 720.0f, 0.1f, 100.0f);
-    view = glm::lookAt(glm::vec3(0.0f, 25.0f, 15.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    projection = glm::perspective(glm::radians(45.0f), (float) System::width / System::height, 0.1f, 100.0f);
+
+    eyePolar = glm::vec3(0.0f, glm::radians(60.0f), 30.0f);
+    
+    Resize(width, height);
 }
 
 void World::Initialize()
 {
     glfwSetWindowUserPointer(System::window, this);
     glfwSetMouseButtonCallback(System::window, glfwMouseCallback);
+    glfwSetKeyCallback(System::window, glfwKeyCallback);
 }
 
 void World::Update(float dt)
 {
+    if (glfwGetKey(System::window, GLFW_KEY_J) == GLFW_PRESS)
+       eyePolar.x += -dt;
+    if (glfwGetKey(System::window, GLFW_KEY_L) == GLFW_PRESS)
+       eyePolar.x += dt;
+    if (glfwGetKey(System::window, GLFW_KEY_I) == GLFW_PRESS)
+       eyePolar.y = glm::clamp<float>(eyePolar.y + dt, -glm::half_pi<float>() + glm::epsilon<float>(), glm::half_pi<float>() - glm::epsilon<float>());
+    if (glfwGetKey(System::window, GLFW_KEY_K) == GLFW_PRESS)
+       eyePolar.y = glm::clamp<float>(eyePolar.y - dt, -glm::half_pi<float>() + glm::epsilon<float>(), glm::half_pi<float>() - glm::epsilon<float>());
+    if (glfwGetKey(System::window, GLFW_KEY_U) == GLFW_PRESS)
+        eyePolar.z += -dt * 50;
+    if (glfwGetKey(System::window, GLFW_KEY_O) == GLFW_PRESS)
+        eyePolar.z += dt * 50;
+
+
+
+    
     player.Update(dt);
 
     for (Block& block : blocks)
@@ -187,7 +225,11 @@ void World::ModifyState()
 void World::Render(float lag)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
+
+    glm::vec3 eye = PolarToRect(eyePolar);
+    view = glm::mat4(1.0f);
+    view = glm::lookAt(eye, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
     glm::mat4 renderTransform = glm::mat4(1.0f);
     renderTransform = projection * view * renderTransform;
 
@@ -208,9 +250,21 @@ bool World::CheckBlockOnGoal(Block& blockChecked)
     return it != blocks.end();
 }
 
+void World::Resize(int newWidth, int newHeight)
+{
+    width = newWidth;
+    height = newHeight;
+
+    floor.model = glm::mat4(1.0f);
+    floor.model = glm::translate(floor.model, glm::vec3(0.0f, -1.0f, 0.0f));
+    floor.model = glm::scale(floor.model, glm::vec3((float)width, 0.0f, (float)height));
+
+    floor.scale = glm::vec3((float)width, 0.0f, (float)height);
+}
+
 glm::vec3 World::GetMouseRay(float mouseX, float mouseY)
 {
-    glm::vec4 clipCoord = glm::vec4(2.0f * mouseX / 1280 - 1.0f, -(2.0f * mouseY / 720 - 1.0f), -1.0f, 1.0f);
+    glm::vec4 clipCoord = glm::vec4(2.0f * mouseX / System::width - 1.0f, -(2.0f * mouseY / System::height - 1.0f), -1.0f, 1.0f);
     glm::vec4 eyeCoord = glm::vec4((glm::inverse(projection) * clipCoord).xy(), -1.0f, 0.0f);
     glm::vec3 ray = glm::normalize((inverse(view) * eyeCoord).xyz());
 
