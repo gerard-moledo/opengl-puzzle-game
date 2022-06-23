@@ -3,7 +3,33 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    World* world = (World*)glfwGetWindowUserPointer(window);
+
+    if (action == GLFW_PRESS)
+    {
+        double mouseX, mouseY;
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+        glm::vec3 ray = world->GetMouseRay((float)mouseX, (float)mouseY);
+        glm::vec3 eye = glm::vec3(0.0f, 25.0f, 15.0f);
+        glm::vec3 planeNormal = glm::vec3(0.0f, 1.0f, 0.0f);
+
+        float rayDotNormal = glm::dot(ray, planeNormal);
+        float t = -(glm::dot(eye, planeNormal) + 1) / rayDotNormal;
+
+        glm::vec3 hit = eye + ray * t;
+        Vector2i hitGrid { (int) roundf(hit.x / 2), (int) roundf(-hit.z / 2) };
+
+        if (button == GLFW_MOUSE_BUTTON_LEFT)
+        {
+            world->blocks.emplace_back(Block { world->renderer, BlockType::block, hitGrid });
+        }
+    }
+}
+
 World::World(Renderer& renderer) :
+    renderer(renderer),
     floor(renderer),
     player(renderer),
     blocks(0, Block(renderer, BlockType::goal, { 0, 0 })),
@@ -16,8 +42,8 @@ World::World(Renderer& renderer) :
 
 void World::Initialize(Renderer& renderer)
 {
-    blocks.emplace_back(Block(renderer, BlockType::wall, { 5, 2 }));
-    blocks.emplace_back(Block(renderer, BlockType::block, { -5, 0 }));
+    glfwSetWindowUserPointer(System::window, this);
+    glfwSetMouseButtonCallback(System::window, glfwMouseCallback);
 }
 
 void World::Update(float dt)
@@ -119,4 +145,13 @@ void World::Render(float lag)
     {
         block.Draw(renderTransform, lag);
     }
+}
+
+glm::vec3 World::GetMouseRay(float mouseX, float mouseY)
+{
+    glm::vec4 clipCoord = glm::vec4(2.0f * mouseX / 1280 - 1.0f, -(2.0f * mouseY / 720 - 1.0f), -1.0f, 1.0f);
+    glm::vec4 eyeCoord = glm::vec4((glm::inverse(projection) * clipCoord).xy(), -1.0f, 0.0f);
+    glm::vec3 ray = glm::normalize((inverse(view) * eyeCoord).xyz());
+
+    return ray;
 }

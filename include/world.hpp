@@ -1,6 +1,9 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#define GLM_FORCE_SWIZZLE
+#include "glm/glm.hpp"
+
 #include <vector>
 #include <string>
 #include <utility>
@@ -21,6 +24,10 @@ struct World
     
     glm::mat4 projection;
     glm::mat4 view;
+
+    Renderer& renderer;
+
+    glm::vec3 GetMouseRay(float mouseX, float mouseY);
     
     void Initialize(Renderer& renderer);
     void Update(float dt);
