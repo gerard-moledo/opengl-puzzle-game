@@ -9,13 +9,12 @@
 
 enum class BlockType { wall, block, goal };
 
-typedef std::pair<BlockType, Vector2i> BlockState;
-typedef std::vector<BlockState> BlockStates;
-
 struct Block
 {
     Block(Renderer& renderer, BlockType type, Vector2i cell);
 
+    State state = State::idle;
+    
     Vector2i currentCell;
     Vector2i targetCell;
     Vector2i direction { 0, 0 };
@@ -31,6 +30,9 @@ struct Block
 
     void Update(float dt);
     void Draw(glm::mat4 renderTransform, float lag);
+
+private:
+    bool Move(float dt);
 };
 
 #endif

@@ -12,29 +12,33 @@ Player::Player(Renderer& renderer) :
     cube.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }
 
-void Player::Update(float dt, BlockStates states)
+void Player::Update(float dt)
 {
     worldPosPrev = worldPos;
 
-    if (currentCell == targetCell)
+    if (state == State::idle)
     {
         ReceiveInput();
         
         if (direction != Vector2i { 0, 0 })
         {
-            CheckState(true, states);
+            accelerating = true;
+
+            state = State::premove;
         }
     }
     
-    if (targetCell != currentCell)
+    if (state == State::moving)
     {
         bool done = Move(dt);
 
         if (done)
         {
+            tMove = 0.0f;
+            accelerating = false;
             currentCell = targetCell;
-            
-            CheckState(false, states);
+
+            state = State::postmove;
         }
     }
 }
@@ -62,33 +66,6 @@ bool Player::Move(float dt)
     worldPos = glm::mix(glmCurrent, glmTarget, glm::clamp(tLerp, 0.0f, 1.0f));
 
     return tLerp >= 1.0f;
-}
-
-void Player::CheckState(bool starting, BlockStates states)
-{
-    Vector2i nextCell = targetCell + direction;
-    if (MoveValid(nextCell, states))
-    {
-        targetCell = nextCell;
-
-        tMove = 0.0f;
-        accelerating = starting;
-    }
-}
-
-bool Player::MoveValid(Vector2i cell, BlockStates states)
-{
-    if (fabsf(cell.x) > 5.0f || fabsf(cell.y) > 5.0f) return false;
-
-    for (BlockState state : states)
-    {
-        if (state.second.x == cell.x && state.second.y == cell.y)
-        {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 void Player::Draw(glm::mat4 renderTransform, float lag)

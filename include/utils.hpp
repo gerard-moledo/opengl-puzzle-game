@@ -1,6 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+constexpr float SPEED = 35;
+
+enum class State { idle, premove, moving, postmove };
+
 struct Vector2i
 {
     int x;

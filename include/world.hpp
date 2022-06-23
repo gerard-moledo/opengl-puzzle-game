@@ -11,17 +11,9 @@
 #include "block.hpp"
 #include "utils.hpp"
 
-struct WorldState
-{
-    Vector2i playerCell;
-    BlockStates blockStates;
-};
-
 struct World
 {
     World(Renderer& renderer);
-
-    WorldState state;
     
     FloorModel floor;
     Player player;
@@ -35,7 +27,7 @@ struct World
     void Render(float lag);
 
 private:
-    void GetState(WorldState& state);
+    void ModifyState();
 };
 
 #endif

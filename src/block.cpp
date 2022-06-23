@@ -27,7 +27,34 @@ Block::Block(Renderer& renderer, BlockType type, Vector2i cell) :
 
 void Block::Update(float dt)
 {
-    
+    worldPosPrev = worldPos;
+
+    if (state == State::moving)
+    {
+        bool done = Move(dt);
+
+        if (done)
+        {
+            tMove = 0.0f;
+            currentCell = targetCell;
+
+            state = State::postmove;
+        }
+    }
+}
+
+bool Block::Move(float dt)
+{
+    tMove += dt;
+
+    float tSolved = sqrtf(1.0f / SPEED);
+    float tLerp = tMove * 2 * SPEED * tSolved;
+
+    glm::vec3 glmCurrent = glm::vec3(currentCell.x, 0.0f, currentCell.y);
+    glm::vec3 glmTarget = glm::vec3(targetCell.x, 0.0f, targetCell.y);
+    worldPos = glm::mix(glmCurrent, glmTarget, glm::clamp(tLerp, 0.0f, 1.0f));
+
+    return tLerp >= 1.0f;
 }
 
 void Block::Draw(glm::mat4 renderTransform, float lag)

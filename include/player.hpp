@@ -7,12 +7,12 @@
 #include "models.hpp"
 #include "utils.hpp"
 
-constexpr float SPEED = 15;
-
 struct Player
 {
     Player(Renderer& renderer);
 
+    State state = State::idle;
+    
     glm::vec3 worldPosPrev { 0.0f, 0.0f, 0.0f };
     glm::vec3 worldPos { 0.0f, 0.0f, 0.0f };
     
@@ -25,14 +25,12 @@ struct Player
     
     CubeModel cube;
 
-    void Update(float dt, BlockStates states);
+    void Update(float dt);
     void Draw(glm::mat4 renderTransform, float lag);
 
 private:
     void ReceiveInput();
-    void CheckState(bool done, BlockStates state);
     bool Move(float dt);
-    bool MoveValid(Vector2i cell, BlockStates state);
 };
 
 #endif

@@ -22,18 +22,87 @@ void World::Initialize(Renderer& renderer)
 
 void World::Update(float dt)
 {
-    GetState(state);
+    player.Update(dt);
+
+    for (Block& block : blocks)
+    {
+        block.Update(dt);
+    }
     
-    player.Update(dt, state.blockStates);
+    ModifyState();
 }
 
-void World::GetState(WorldState& state)
+void World::ModifyState()
 {
-    state.playerCell = player.currentCell;
-
-    for (Block block : blocks)
+    if (player.state == State::premove || player.state == State::postmove)
     {
-        state.blockStates.emplace_back(std::make_pair(block.type, block.currentCell));
+        if (glm::abs(player.currentCell.x + player.direction.x) > 5 || 
+            glm::abs(player.currentCell.y + player.direction.y) > 5)
+        {
+            player.state = State::idle;
+        }
+        for (Block& block : blocks)
+        {
+            if (player.currentCell + player.direction == block.currentCell)
+            {
+                if (player.state == State::premove)
+                {
+                    player.state = State::idle;
+                }
+                if (player.state == State::postmove)
+                {
+                    player.state = State::idle;
+
+                    if (block.type == BlockType::block)
+                    {
+                        block.state = State::postmove;
+                        block.direction = player.direction;
+                    }
+                }
+                break;
+            }
+        }
+
+        if (player.state == State::premove || player.state == State::postmove)
+        {
+            player.state = State::moving;
+            player.targetCell = player.currentCell + player.direction;
+        }
+    }
+
+    for (Block& blockActive : blocks)
+    {
+        if (blockActive.state == State::postmove)
+        {   
+            if (glm::abs(blockActive.currentCell.x + blockActive.direction.x) > 5 ||
+                glm::abs(blockActive.currentCell.y + blockActive.direction.y) > 5)
+            {
+                blockActive.state = State::idle;
+                continue;
+            }
+            
+            for (Block& blockChecked : blocks)
+            {
+                if (blockActive.currentCell + blockActive.direction == blockChecked.currentCell)
+                {
+                    blockActive.state = State::idle;
+
+                    if (blockChecked.type == BlockType::block)
+                    {
+                        blockChecked.state = State::postmove;
+                        blockChecked.direction = blockActive.direction;
+                    }
+
+                    break;
+                }
+            }
+
+            if (blockActive.state == State::postmove)
+            {
+                blockActive.targetCell = blockActive.currentCell + blockActive.direction;
+                blockActive.state = State::moving;
+            }
+        }
     }
 }
 
