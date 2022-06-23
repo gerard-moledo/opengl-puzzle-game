@@ -14,7 +14,7 @@ void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
         double mouseX, mouseY;
         glfwGetCursorPos(window, &mouseX, &mouseY);
         glm::vec3 ray = world->GetMouseRay((float)mouseX, (float)mouseY);
-        glm::vec3 eye = glm::vec3(0.0f, 25.0f, 15.0f);
+        glm::vec3 eye = PolarToRect(world->eyePolar);
         glm::vec3 planeNormal = glm::vec3(0.0f, 1.0f, 0.0f);
 
         float rayDotNormal = glm::dot(ray, planeNormal);
