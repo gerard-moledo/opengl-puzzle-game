@@ -11,6 +11,9 @@
 
 namespace System
 {
+    extern int width;
+    extern int height;
+
     extern GLFWwindow* window;
     extern std::unordered_map<std::string, GLuint> programMap;
 

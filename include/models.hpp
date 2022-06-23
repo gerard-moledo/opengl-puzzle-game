@@ -11,7 +11,8 @@ struct FloorModel
 
     Renderer renderer;
     glm::mat4 model;
-
+    glm::vec3 scale;
+    
     void Draw(glm::mat4 worldTransform);
 };
 

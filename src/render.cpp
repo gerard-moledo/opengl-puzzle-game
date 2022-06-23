@@ -61,4 +61,5 @@ Render::Render(BufferInfo info, GLuint p)
     transformLocation = glGetUniformLocation(program, "transform");
     colorLocation = glGetUniformLocation(program, "color");
     textureLocation = glGetUniformLocation(program, "textureSampler");
+    texScaleLocation = glGetUniformLocation(program, "texScale");
 }

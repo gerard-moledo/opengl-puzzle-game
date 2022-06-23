@@ -4,6 +4,9 @@
 
 namespace System
 {
+    int width = 800;
+    int height = 450;
+    
     GLFWwindow* window = nullptr;
     std::unordered_map<std::string, GLuint> programMap;
 
@@ -14,7 +17,7 @@ namespace System
     {
         glfwInit();
 
-        window = glfwCreateWindow(1280, 720, "Puzzle", NULL, NULL);
+        window = glfwCreateWindow(width, height, "Puzzle", NULL, NULL);
 
         glfwSetWindowPos(window, 640, 320);
 

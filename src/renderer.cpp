@@ -23,7 +23,7 @@ void Renderer::BindState()
     glUseProgram(active.program);
 }
 
-void Renderer::SetUniforms(glm::mat4 transform, glm::vec4 color, GLuint texture)
+void Renderer::SetUniforms(glm::mat4 transform, glm::vec4 color, GLuint texture, glm::vec3 scale)
 {
     glUniformMatrix4fv(active.transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
 
@@ -31,6 +31,7 @@ void Renderer::SetUniforms(glm::mat4 transform, glm::vec4 color, GLuint texture)
     
     glActiveTexture(GL_TEXTURE0 + texture);
     glUniform1i(active.textureLocation, texture);
+    glUniform2f(active.texScaleLocation, scale.x, scale.z);
 }
 
 void Renderer::DrawBuffer()

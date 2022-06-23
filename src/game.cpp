@@ -13,7 +13,7 @@ Game::Game() :
 
 void Game::Start()
 {
-    glViewport(0, 0, 1280, 720);
+    glViewport(0, 0, System::width, System::height);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glEnable(GL_CULL_FACE);

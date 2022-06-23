@@ -17,7 +17,7 @@ struct Renderer
     Render active;
 
     void BindState();
-    void SetUniforms(glm::mat4 transform, glm::vec4 color, GLuint texture);
+    void SetUniforms(glm::mat4 transform, glm::vec4 color, GLuint texture, glm::vec3 scale);
     void DrawBuffer();
 };
 

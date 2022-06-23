@@ -40,6 +40,7 @@ struct Render
     GLint transformLocation;
     GLint colorLocation;
     GLint textureLocation;
+    GLint texScaleLocation;
 };
 
 #endif
