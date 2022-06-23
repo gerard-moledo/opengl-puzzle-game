@@ -108,8 +108,8 @@ void World::ModifyState()
 {
     if (player.state == State::premove || player.state == State::postmove)
     {
-        if (glm::abs(player.currentCell.x + player.direction.x) > 5 || 
-            glm::abs(player.currentCell.y + player.direction.y) > 5)
+        if (glm::abs(player.currentCell.x + player.direction.x) > width / 2 || 
+            glm::abs(player.currentCell.y + player.direction.y) > height / 2)
         {
             player.state = State::idle;
         }
@@ -127,7 +127,7 @@ void World::ModifyState()
                 {
                     player.state = State::idle;
 
-                    if (block.type == BlockType::block)
+                    if (block.type == BlockType::block && !block.onGoal)
                     {
                         block.state = State::postmove;
                         block.direction = player.direction;
@@ -148,10 +148,11 @@ void World::ModifyState()
     {
         if (blockActive.state == State::postmove)
         {   
-            if (glm::abs(blockActive.currentCell.x + blockActive.direction.x) > 5 ||
-                glm::abs(blockActive.currentCell.y + blockActive.direction.y) > 5)
+            if (glm::abs(blockActive.currentCell.x + blockActive.direction.x) > width / 2 ||
+                glm::abs(blockActive.currentCell.y + blockActive.direction.y) > height / 2)
             {
                 blockActive.state = State::idle;
+                blockActive.onGoal = CheckBlockOnGoal(blockActive);
                 continue;
             }
             
@@ -162,8 +163,9 @@ void World::ModifyState()
                 if (blockActive.currentCell + blockActive.direction == blockChecked.currentCell)
                 {
                     blockActive.state = State::idle;
-
-                    if (blockChecked.type == BlockType::block)
+                    blockActive.onGoal = CheckBlockOnGoal(blockActive);
+                    
+                    if (blockChecked.type == BlockType::block && !blockChecked.onGoal)
                     {
                         blockChecked.state = State::postmove;
                         blockChecked.direction = blockActive.direction;
@@ -195,6 +197,15 @@ void World::Render(float lag)
     {
         block.Draw(renderTransform, lag);
     }
+}
+
+bool World::CheckBlockOnGoal(Block& blockChecked)
+{
+    auto it = std::find_if(blocks.begin(), blocks.end(), [&](Block block) {
+        return block.currentCell == blockChecked.currentCell && block.type == BlockType::goal;
+    });
+
+    return it != blocks.end();
 }
 
 glm::vec3 World::GetMouseRay(float mouseX, float mouseY)

@@ -14,6 +14,8 @@ struct Block
     Block(Renderer& renderer, BlockType type, Vector2i cell);
 
     State state = State::idle;
+
+    bool onGoal = false;
     
     Vector2i currentCell;
     Vector2i targetCell;

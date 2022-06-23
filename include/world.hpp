@@ -17,6 +17,9 @@
 struct World
 {
     World(Renderer& renderer);
+
+    int width = 9;
+    int height = 9;
     
     FloorModel floor;
     Player player;
@@ -35,6 +38,7 @@ struct World
 
 private:
     void ModifyState();
+    bool CheckBlockOnGoal(Block& block);
 };
 
 #endif

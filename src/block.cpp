@@ -52,7 +52,8 @@ void Block::Draw(glm::mat4 renderTransform, float lag)
             cube.color = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
             break;
         case BlockType::block:
-            cube.color = glm::vec4(0.588f, 0.294f, 0.0f, 1.0f);
+            if (onGoal) cube.color = glm::vec4(1.0f, 0.9f, 0.0f, 1.0f);
+            else        cube.color = glm::vec4(0.588f, 0.294f, 0.0f, 1.0f);
             break;
         case BlockType::goal:
             cube.color = glm::vec4(1.0f, 1.0f, 0.0f, 0.8f);
