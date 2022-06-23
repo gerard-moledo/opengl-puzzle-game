@@ -41,6 +41,25 @@ void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
                 world->blocks.emplace_back(Block { world->renderer, BlockType::block, hitGrid });
             }
         }
+
+        if (button == GLFW_MOUSE_BUTTON_MIDDLE)
+        {
+            bool occupied = false;
+            for (Block& block : world->blocks)
+            {
+                if (block.currentCell == hitGrid)
+                {
+                    occupied = true;
+                }
+            }
+
+            if (!occupied)
+            {
+                world->player.currentCell = hitGrid;
+                world->player.targetCell = hitGrid;
+                world->player.worldPos = glm::vec3(hitGrid.x, 0.0f, hitGrid.y);
+            }
+        }
         
         if (button == GLFW_MOUSE_BUTTON_RIGHT)
         {
