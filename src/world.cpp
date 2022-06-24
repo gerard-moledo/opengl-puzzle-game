@@ -98,6 +98,7 @@ World::World(Renderer& renderer) :
     blocks(0, Block(renderer, BlockType::goal, { 0, 0 })),
     projection(glm::mat4(1.0f)),
     view(glm::mat4(1.0f)),
+    eyePolarPrev(glm::vec3(0.0f)),
     eyePolar(glm::vec3(0.0f))
 {
     projection = glm::perspective(glm::radians(45.0f), (float) System::width / System::height, 0.1f, 100.0f);
@@ -116,6 +117,8 @@ void World::Initialize()
 
 void World::Update(float dt)
 {
+    eyePolarPrev = eyePolar;
+    
     if (glfwGetKey(System::window, GLFW_KEY_J) == GLFW_PRESS)
        eyePolar.x += -dt;
     if (glfwGetKey(System::window, GLFW_KEY_L) == GLFW_PRESS)
@@ -226,7 +229,8 @@ void World::Render(float lag)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::vec3 eye = PolarToRect(eyePolar);
+    glm::vec3 eyePolarLerped = glm::mix(eyePolarPrev, eyePolar, lag);
+    glm::vec3 eye = PolarToRect(eyePolarLerped);
     view = glm::mat4(1.0f);
     view = glm::lookAt(eye, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 

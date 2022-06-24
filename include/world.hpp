@@ -27,6 +27,7 @@ struct World
     
     glm::mat4 projection;
     glm::mat4 view;
+    glm::vec3 eyePolarPrev;
     glm::vec3 eyePolar;
     
     Renderer& renderer;
