@@ -19,7 +19,7 @@ LINKS = -lglfw3 -lgdi32 -luser32 -lkernel32
 
 ifneq ($(BUILD), 'desktop')
 	LINKS += -s USE_GLFW=3 -s MAX_WEBGL_VERSION=2 -s MIN_WEBGL_VERSION=2 --preload-file Assets/ \
-			-o program.html 
+			-o index.html --shell-file shell.html
 else
 	LINKS += -o program.exe
 endif
