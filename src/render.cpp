@@ -24,12 +24,15 @@ Render::Render(BufferInfo info, GLuint p)
 
     for (BufferLayout layout : info.layouts)
     {
-        glVertexAttribPointer(
-            layout.location, layout.size,
-            GL_FLOAT, GL_FALSE,
-            layout.stride, (void*)layout.offset
-        );
-        glEnableVertexAttribArray(layout.location);
+        if (layout.size > 0)
+        {
+            glVertexAttribPointer(
+                layout.location, layout.size,
+                GL_FLOAT, GL_FALSE,
+                layout.stride, (void*)layout.offset
+            );
+            glEnableVertexAttribArray(layout.location);
+        }
     }
 
     glBindVertexArray(0);

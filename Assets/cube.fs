@@ -1,8 +1,8 @@
-#version 330 core
+#version 300 es
+ 
+out mediump vec4 FragColor;
 
-out vec4 FragColor;
-
-in vec4 vColor;/*
+in mediump vec4 vColor;/*
 in vec2 vTexCoord; */
 
 /* uniform sampler2D textureSampler; */

@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#define GLFW_INCLUDE_NONE
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
  
@@ -23,10 +24,10 @@ struct Game
     void Run();
     void Quit();
 
+    void CalculateFramerate(float dt);
+    
 private:
     void Start();
-    
-    void CalculateFramerate(float dt);
 };
 
 #endif

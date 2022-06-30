@@ -1,8 +1,13 @@
 #include "game.hpp"
 
 #include <cstdio>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "system.hpp"
+
+void GameLoop(void* instance);
 
 Game::Game() :
     renderer(),
@@ -19,6 +24,10 @@ void Game::Start()
     glEnable(GL_CULL_FACE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
+#ifndef __EMSCRIPTEN__
+    glfwSwapInterval(1);
+#endif
+    
     world.Initialize();
 }
 
@@ -26,29 +35,46 @@ void Game::Run()
 {
     Start();
 
+#ifdef __EMSCRIPTEN__
+    emscripten_set_main_loop_arg(GameLoop, this, 0, 1);
+#else
     while (!glfwWindowShouldClose(System::window))
     {
-        float tCurrent = (float)glfwGetTime();
-        float dt = tCurrent - tPrev;
-        tPrev = tCurrent;
-        stackedTime += dt;
-        
-        CalculateFramerate(dt);
-        
-        glfwPollEvents();
-        
-        while (stackedTime > timestep)
-        {
-            stackedTime -= timestep;
-            
-            world.Update(timestep);
-        }
-
-        float lag = stackedTime / timestep;
-        world.Render(lag);
-        
-        glfwSwapBuffers(System::window);
+        GameLoop(this);
     }
+#endif
+    
+}
+
+void GameLoop(void* instance)
+{
+    Game* GAME = (Game*)instance;
+
+#ifdef __EMSCRIPTEN__
+    double time = emscripten_get_now() / 1000;
+#else
+    double time = glfwGetTime();
+#endif
+
+    float tCurrent = (float)time;
+    float dt = tCurrent - GAME->tPrev;
+    GAME->tPrev = tCurrent;
+    GAME->stackedTime += dt;
+    GAME->CalculateFramerate(dt);
+
+    glfwPollEvents();
+
+    while (GAME->stackedTime > GAME->timestep)
+    {
+        GAME->stackedTime -= GAME->timestep;
+
+        GAME->world.Update(GAME->timestep);
+    }
+
+    float lag = GAME->stackedTime / GAME->timestep;
+    GAME->world.Render(lag);
+
+    glfwSwapBuffers(System::window);
 }
 
 void Game::CalculateFramerate(float dt)

@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <string>
 
+#define GLFW_INCLUDE_NONE
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 

@@ -6,6 +6,7 @@ namespace System
 {
     int width = 800;
     int height = 450;
+    bool initialized = false;
     
     GLFWwindow* window = nullptr;
     std::unordered_map<std::string, GLuint> programMap;
@@ -22,12 +23,11 @@ namespace System
         glfwSetWindowPos(window, 640, 320);
 
         glfwMakeContextCurrent(window);
-        glfwSwapInterval(1);
 
-        gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+        gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
 
-        programMap["floor"] = CreateShader("floor");
-        programMap["cube"] = CreateShader("cube");
+        programMap.emplace(std::string("floor"), CreateShader("floor"));
+        programMap.emplace(std::string("cube"), CreateShader("cube"));
 
         renderFloor = Render(ExtractDataFromFile("floor"), programMap["floor"]);
         renderCube = Render(ExtractDataFromFile("cube"), programMap["cube"]);
@@ -38,32 +38,38 @@ namespace System
         std::string vertexSource {};
         std::string fragmentSource {};
 
-        ReadShaderFromFile(vertexSource, filename + std::string(".vs"));
-        ReadShaderFromFile(fragmentSource, filename + std::string(".fs"));
+        ReadShaderFromFile(vertexSource, "Assets/" + filename + ".vs");
+        ReadShaderFromFile(fragmentSource, "Assets/" + filename + ".fs");
 
-        const char* vertexString = vertexSource.c_str();
-        const char* fragmentString = fragmentSource.c_str();
+        const GLchar* vertexString = vertexSource.c_str();
+        const GLchar* fragmentString = fragmentSource.c_str();
 
         GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertexShader, 1, &vertexString, NULL);
         glCompileShader(vertexShader);
+        GLint obj;
+        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &obj);
+        GLchar vertInfo[1000];
+        glGetShaderInfoLog(vertexShader, 1000, nullptr, vertInfo);
 
         GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
         glShaderSource(fragmentShader, 1, &fragmentString, NULL);
         glCompileShader(fragmentShader);
-
+        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &obj);
+        GLchar fragInfo[1000];
+        glGetShaderInfoLog(fragmentShader, 1000, nullptr, fragInfo);
+        
         GLuint program = glCreateProgram();
         glAttachShader(program, vertexShader);
         glAttachShader(program, fragmentShader);
         glLinkProgram(program);
-
-        GLchar info[200];
-        glGetProgramInfoLog(program, 200, nullptr, info);
-        printf("%s", info);
+        
+        GLchar info[2200];
+        glGetProgramInfoLog(program, 2200, nullptr, info);
 
         glDeleteShader(vertexShader);
         glDeleteShader(fragmentShader);
-
+        
         return program;
     }
 
@@ -87,28 +93,28 @@ namespace System
     {
         BufferInfo data;
 
-        std::ifstream filestream {};
-        filestream.open(type + ".data");
-
+        std::fstream filestream {};
+        filestream.open("Assets/" + type + ".data");
+        
         std::string bufferType;
         std::vector<int> layoutSizes;
         int size;
         float arrayBufferDatum;
         unsigned int elementBufferDatum;
-
+        
         while (filestream.peek() != EOF)
-        {
-            filestream >> bufferType;
+         {
+             filestream >> bufferType;
 
-            if (bufferType[0] == 'A')
-            {
-                int totalSize = 0;
-                while (filestream.peek() != '\n')
+             if (bufferType[0] == 'A')
+             {
+                 int totalSize = 0;
+                 while (filestream.peek() != '\r' && filestream.peek() != '\n')
                 {
                     filestream >> size;
                     layoutSizes.emplace_back(size);
                     totalSize += size;
-                }
+                 }
 
                 int offset = 0;
                 for (int sizeIndex = 0; sizeIndex < layoutSizes.size(); sizeIndex++)
@@ -122,8 +128,6 @@ namespace System
 
                     offset += layout.size;
                 }
-
-                filestream.clear();
                 filestream.get();
 
                 while (filestream >> arrayBufferDatum)
@@ -131,17 +135,21 @@ namespace System
                     data.arrayBufferData.emplace_back(arrayBufferDatum);
                 }
                 filestream.clear();
-            }
-            if (bufferType[0] == 'E')
-            {
-                while (filestream >> elementBufferDatum)
-                {
-                    data.elementBufferData.emplace_back(elementBufferDatum);
-                }
-                filestream.clear();
-            }
+                filestream.putback('E');
+             }
+            
+             if (bufferType[0] == 'E')
+             {
+                 while (filestream >> elementBufferDatum)
+                 {
+                     data.elementBufferData.emplace_back(elementBufferDatum);
+                 }
+                 filestream.clear();
+             }
         }
 
+        filestream.close();
+        
         return data;
     }
     

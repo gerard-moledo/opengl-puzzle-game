@@ -1,6 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
+#define GLFW_INCLUDE_NONE
 #include "glad/glad.h"
 #include "glfw/glfw3.h"
 

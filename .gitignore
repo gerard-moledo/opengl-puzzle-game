@@ -1,4 +1,10 @@
 /.vscode
 *.exe
 /objs
+/objs_em
 /builds
+*.html
+*.js
+*.wasm
+program.data
+*.7z

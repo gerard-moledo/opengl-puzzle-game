@@ -1,6 +1,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+#define GLFW_INCLUDE_NONE
+
 #include "system.hpp"
 #include "game.hpp"
 
