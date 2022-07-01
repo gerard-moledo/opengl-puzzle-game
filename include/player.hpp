@@ -7,8 +7,9 @@
 #include "models.hpp"
 #include "utils.hpp"
 
-struct Player
+class Player
 {
+public:
     Player();
 
     State state = State::idle;

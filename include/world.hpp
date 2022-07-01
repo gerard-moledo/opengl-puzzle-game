@@ -14,8 +14,9 @@
 #include "block.hpp"
 #include "utils.hpp"
 
-struct World
+class World
 {
+public:
     World();
 
     int width = 7;

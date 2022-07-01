@@ -8,8 +8,9 @@
 #include "world.hpp"
 #include "renderer.hpp"
 
-struct Game
+class Game
 {
+public:
     Game();
 
     World world;

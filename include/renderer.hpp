@@ -11,8 +11,9 @@
 
 #include "system.hpp"
 
-struct Renderer
+class Renderer
 {
+public:
     Renderer(Render render);
     
     Render active;

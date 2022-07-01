@@ -9,8 +9,9 @@
 
 enum class BlockType { block, wall, goal };
 
-struct Block
+class Block
 {
+public:
     Block(BlockType type, Vector2i cell);
 
     State state = State::idle;

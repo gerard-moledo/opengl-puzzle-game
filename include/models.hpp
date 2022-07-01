@@ -5,8 +5,9 @@
 
 #include "renderer.hpp"
 
-struct FloorModel
+class FloorModel
 {
+public:
     FloorModel();
 
     Renderer renderer;
@@ -16,8 +17,9 @@ struct FloorModel
     void Draw(glm::mat4 worldTransform);
 };
 
-struct CubeModel
+class CubeModel
 {
+public:
     CubeModel();
 
     Renderer renderer;
