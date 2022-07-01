@@ -19,6 +19,7 @@ class World
 public:
     World();
 
+    int level = 1;
     int width = 7;
     int height = 7;
 
@@ -40,7 +41,7 @@ public:
     void Update(float dt);
     void Render(float lag);
 
-    void LoadLevel(int level);
+    void LoadLevel();
     
 private:
     void ModifyState();

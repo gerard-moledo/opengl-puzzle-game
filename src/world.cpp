@@ -84,7 +84,18 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
     {
         world->mode = world->mode == Mode::play ? Mode::edit : Mode::play;
     }
-    
+
+    if (key == GLFW_KEY_X && action == GLFW_PRESS)
+    {
+        world->level = world->level == System::levels.size() ? 1 : world->level + 1;
+        world->LoadLevel();
+    }
+    if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+    {
+        world->level = world->level == 1 ? System::levels.size() : world->level - 1;
+        world->LoadLevel();
+    }
+
     if (world->mode == Mode::play) return;
     
     Vector2i resize = Vector2i { 0, 0 };
@@ -124,11 +135,11 @@ void World::Initialize()
 
     if (mode == Mode::play)
     {
-        LoadLevel(2);
+        LoadLevel();
     }
 }
 
-void World::LoadLevel(int level)
+void World::LoadLevel()
 {
     blocks.clear();
 
