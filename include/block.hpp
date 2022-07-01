@@ -7,8 +7,6 @@
 #include "renderer.hpp"
 #include "utils.hpp"
 
-enum class BlockType { block, wall, goal };
-
 class Block
 {
 public:
