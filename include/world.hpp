@@ -42,7 +42,8 @@ public:
     void Render(float lag);
 
     void LoadLevel();
-    
+    void CopyLevel();
+
 private:
     void ModifyState();
     bool CheckBlockOnGoal(Block& block);

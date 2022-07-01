@@ -39,9 +39,26 @@ struct Vector2i
     
 };
 
+struct LevelInfo
+{
+    Vector2i size;
+    Vector2i playerStart;
+    std::vector<std::pair<BlockType, Vector2i>> blockData;
+};
+
 inline glm::vec3 PolarToRect(glm::vec3 polar)
 {
     return glm::euclidean(glm::vec2(polar.y, polar.x)) * polar.z;
+}
+
+inline Vector2i LevelToWorld(Vector2i levelCoord, Vector2i worldSize)
+{
+    return Vector2i { levelCoord.x - worldSize.x / 2, (levelCoord.y - worldSize.y / 2) * -1 };
+}
+
+inline Vector2i WorldToLevel(Vector2i worldCoord, Vector2i worldSize)
+{
+    return Vector2i { worldCoord.x + worldSize.x / 2, worldSize.y / 2 - worldCoord.y };
 }
 
 #endif

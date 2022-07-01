@@ -197,6 +197,8 @@ namespace System
                 }
 
                 column++;
+
+                filestream.get();
                 
                 if (filestream.peek() == '\n' || filestream.peek() == '\r')
                 {
@@ -206,12 +208,13 @@ namespace System
                 }
             }
             rows = row;
-            info.playerStart = Vector2i { info.playerStart.x - columns / 2, (info.playerStart.y - rows / 2) * -1 };
+            
+            info.size = Vector2i { columns, rows };
+            info.playerStart = LevelToWorld(info.playerStart, info.size);
             for (auto& data : info.blockData)
             {
-                data.second = Vector2i { data.second.x - columns / 2, (data.second.y - rows / 2) * -1 };
+                data.second = LevelToWorld(data.second, info.size);
             }
-            info.size = Vector2i { columns, rows };
 
             levels.emplace_back(info);
             

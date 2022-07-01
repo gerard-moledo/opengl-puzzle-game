@@ -4,6 +4,7 @@
 #include "glm/gtc/type_ptr.hpp"
 
 #include <algorithm>
+#include <sstream>
 
 void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
 {
@@ -97,7 +98,14 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
     }
 
     if (world->mode == Mode::play) return;
-    
+
+    if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
+    {
+#ifndef __EMSCRIPTEN__
+        world->CopyLevel();
+#endif
+    }
+
     Vector2i resize = Vector2i { 0, 0 };
     
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)   resize.x = -2;
@@ -154,6 +162,43 @@ void World::LoadLevel()
     }
 
     Resize(System::levels[level - 1].size.x, System::levels[level - 1].size.y);
+}
+
+void World::CopyLevel()
+{
+    std::string levelText {};
+    
+    for (int cell = 0; cell < width * height; cell++)
+    {
+        Vector2i location { cell % width, cell / width };
+        if (location.x == 0) levelText += "\n";
+        
+        if (LevelToWorld(location, Vector2i { width, height }) == player.currentCell)
+        {
+            levelText += "@ ";
+            continue;
+        }
+        
+        auto it = std::find_if(blocks.begin(), blocks.end(), [&](Block block) {
+            return LevelToWorld(location, Vector2i { width, height }) == block.currentCell;
+        });
+        if (it != blocks.end())
+        {
+            switch (it->type)
+            {
+                case BlockType::wall:   levelText += "# "; break;
+                case BlockType::block:  levelText += "B "; break;
+                case BlockType::goal:   levelText += "o "; break;
+            }
+            continue;
+        }
+        
+        levelText += ". ";
+    }
+    levelText += "\n\n-------------------------------------\n";
+
+    glfwSetClipboardString(System::window, levelText.c_str());
+    printf("%s", levelText.c_str());
 }
 
 void World::Update(float dt)
@@ -308,6 +353,8 @@ void World::Resize(int newWidth, int newHeight)
 
     floor.scale = glm::vec3((float)width, 0.0f, (float)height);
 }
+
+
 
 glm::vec3 World::GetMouseRay(float mouseX, float mouseY)
 {

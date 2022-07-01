@@ -11,13 +11,6 @@
 #include "render.hpp"
 #include "utils.hpp"
 
-struct LevelInfo
-{
-    Vector2i size;
-    Vector2i playerStart;
-    std::vector<std::pair<BlockType, Vector2i>> blockData;
-};
-
 namespace System
 {
     extern int width;
