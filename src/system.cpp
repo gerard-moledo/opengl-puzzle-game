@@ -13,6 +13,8 @@ namespace System
 
     Render renderFloor;
     Render renderCube;
+
+    std::vector<LevelInfo> levels;
     
     void Initialize()
     {
@@ -29,8 +31,10 @@ namespace System
         programMap.emplace(std::string("floor"), CreateShader("floor"));
         programMap.emplace(std::string("cube"), CreateShader("cube"));
 
-        renderFloor = Render(ExtractDataFromFile("floor"), programMap["floor"]);
-        renderCube = Render(ExtractDataFromFile("cube"), programMap["cube"]);
+        renderFloor = Render(ExtractBufferDataFromFile("floor"), programMap["floor"]);
+        renderCube = Render(ExtractBufferDataFromFile("cube"), programMap["cube"]);
+
+        ExtractLevelDataFromFile(levels);
     }
 
     GLuint CreateShader(std::string filename)
@@ -89,7 +93,7 @@ namespace System
         filestream.close();
     }
 
-    BufferInfo ExtractDataFromFile(std::string type)
+    BufferInfo ExtractBufferDataFromFile(std::string type)
     {
         BufferInfo data;
 
@@ -151,6 +155,68 @@ namespace System
         filestream.close();
         
         return data;
+    }
+
+    void ExtractLevelDataFromFile(std::vector<LevelInfo>& levels)
+    {
+        std::ifstream filestream {};
+        filestream.open("Assets/levels.data");
+
+        int level;
+        int row, rows, column, columns;
+        char cell;
+        
+        while (filestream.peek() != EOF)
+        {
+            filestream >> level;
+
+            LevelInfo info;
+            
+            row = 0, rows = 0;
+            column = 0, columns = 0;
+            while (filestream >> cell)
+            {
+                if (cell == '-') break;
+
+                Vector2i location { column, row};
+
+                switch (cell)
+                {
+                    case '@':
+                        info.playerStart = location;
+                        break;
+                    case '#':
+                        info.blockData.emplace_back(std::pair<BlockType, Vector2i>(BlockType::wall, location));
+                        break;
+                    case 'B':
+                        info.blockData.emplace_back(std::pair<BlockType, Vector2i>(BlockType::block, location));
+                        break;
+                    case 'o':
+                        info.blockData.emplace_back(std::pair<BlockType, Vector2i>(BlockType::goal, location));
+                        break;
+                }
+
+                column++;
+                
+                if (filestream.peek() == '\n' || filestream.peek() == '\r')
+                {
+                    row++;
+                    if (column > columns) columns = column;
+                    column = 0;
+                }
+            }
+            rows = row;
+            info.playerStart = Vector2i { info.playerStart.x - columns / 2, (info.playerStart.y - rows / 2) * -1 };
+            for (auto& data : info.blockData)
+            {
+                data.second = Vector2i { data.second.x - columns / 2, (data.second.y - rows / 2) * -1 };
+            }
+            info.size = Vector2i { columns, rows };
+
+            levels.emplace_back(info);
+            
+            filestream.ignore(50, '\n');
+        }
     }
     
     void Quit()

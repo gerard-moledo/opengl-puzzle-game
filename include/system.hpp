@@ -9,6 +9,14 @@
 #include <unordered_map>
 
 #include "render.hpp"
+#include "utils.hpp"
+
+struct LevelInfo
+{
+    Vector2i size;
+    Vector2i playerStart;
+    std::vector<std::pair<BlockType, Vector2i>> blockData;
+};
 
 namespace System
 {
@@ -17,16 +25,19 @@ namespace System
 
     extern GLFWwindow* window;
     extern std::unordered_map<std::string, GLuint> programMap;
-
+    
     extern Render renderFloor;
     extern Render renderCube;
+
+    extern std::vector<LevelInfo> levels;
     
     void Initialize();
 
     GLuint CreateShader(std::string filename);
     void ReadShaderFromFile(std::string& shader, std::string file);
 
-    BufferInfo ExtractDataFromFile(std::string type);
+    BufferInfo ExtractBufferDataFromFile(std::string type);
+    void ExtractLevelDataFromFile(std::vector<LevelInfo>& levels);
     
     void Quit();
 };

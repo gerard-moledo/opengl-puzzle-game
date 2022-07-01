@@ -40,6 +40,8 @@ public:
     void Update(float dt);
     void Render(float lag);
 
+    void LoadLevel(int level);
+    
 private:
     void ModifyState();
     bool CheckBlockOnGoal(Block& block);

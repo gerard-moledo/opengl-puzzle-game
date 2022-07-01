@@ -122,7 +122,27 @@ void World::Initialize()
     glfwSetMouseButtonCallback(System::window, glfwMouseCallback);
     glfwSetKeyCallback(System::window, glfwKeyCallback);
 
-    
+    if (mode == Mode::play)
+    {
+        LoadLevel(2);
+    }
+}
+
+void World::LoadLevel(int level)
+{
+    blocks.clear();
+
+    Vector2i playerStart = System::levels[level - 1].playerStart;
+    player.currentCell = playerStart;
+    player.targetCell = playerStart;
+    player.worldPos = glm::vec3(playerStart.x, 0.0f, playerStart.y);
+
+    for (auto& data : System::levels[level - 1].blockData)
+    {
+        blocks.emplace_back(Block(data.first, data.second));
+    }
+
+    Resize(System::levels[level - 1].size.x, System::levels[level - 1].size.y);
 }
 
 void World::Update(float dt)
