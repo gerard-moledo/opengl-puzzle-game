@@ -25,8 +25,10 @@ else
 			-o index.html --shell-file shell.html
 endif
 
-ifneq ($(BUILD), 'debug')
-	LINKS += -03 --profiling-funcs
+ifneq ($(PLATFORM), 'desktop')
+	ifneq ($(BUILD), 'debug')
+		LINKS += -03 --profiling-funcs
+	endif
 endif
 
 ifeq ($(PLATFORM), 'desktop')
@@ -41,7 +43,11 @@ DEBUG = -g
 ifeq ($(BUILD), 'debug')
 	CXXFLAGS = $(INCLUDES) $(DEBUG)
 else
-	CXXFLAGS = $(INCLUDES) --profiling
+	ifeq ($(PLATFORM), 'desktop')
+		CXXFLAGS = $(INCLUDES)
+	else
+		CXXFLAGS = $(INCLUDES) --profiling
+	endif
 endif
 
 ifeq ($(PLATFORM), 'desktop')
