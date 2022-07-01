@@ -1,11 +1,12 @@
 VPATH = src:include
-BUILD = 'desktop'
+PLATFORM = 'desktop'
+BUILD = 'debug'
 
 DEV = D:\\_Work\\_Dev_Libs
 
 IDIRS = include $(DEV)\\glad-es\\include  $(DEV)\\glm $(DEV)\\stb
 
-ifeq ($(BUILD), 'desktop')
+ifeq ($(PLATFORM), 'desktop')
 	IDIRS += $(DEV)\\glfw-3.2.bin.WIN64\\include
 else
 	IDIRS += $(DEV)\\emsdk\\upstream\\emscripten\\cache\\sysroot\\include
@@ -17,14 +18,18 @@ LDIRS = $(DEV)\\glfw-3.2.bin.WIN64\\lib-mingw-w64 $(DEV)\\w64devkit\\x86_64-w64-
 LIBRARIES = $(patsubst %,-L%,$(LDIRS))
 LINKS = -lglfw3 -lgdi32 -luser32 -lkernel32 
 
-ifneq ($(BUILD), 'desktop')
+ifeq ($(PLATFORM), 'desktop')
+	LINKS += -o program.exe
+else
 	LINKS += -s USE_GLFW=3 -s MAX_WEBGL_VERSION=2 -s MIN_WEBGL_VERSION=2 --preload-file Assets/ \
 			-o index.html --shell-file shell.html
-else
-	LINKS += -o program.exe
 endif
 
-ifeq ($(BUILD), 'desktop')
+ifneq ($(BUILD), 'debug')
+	LINKS += -03 --profiling-funcs
+endif
+
+ifeq ($(PLATFORM), 'desktop')
 	OBJDIR = objs
 else
 	OBJDIR = objs_em
@@ -33,9 +38,13 @@ OBJS = $(patsubst src/%.cpp,$(OBJDIR)/%.o,$(wildcard src/*.cpp)) $(OBJDIR)/glad.
 
 DEBUG = -g
 
-CXXFLAGS = $(INCLUDES) $(DEBUG)
+ifeq ($(BUILD), 'debug')
+	CXXFLAGS = $(INCLUDES) $(DEBUG)
+else
+	CXXFLAGS = $(INCLUDES) --profiling
+endif
 
-ifeq ($(BUILD), 'desktop')
+ifeq ($(PLATFORM), 'desktop')
 	CC = g++
 else
 	CC = em++
