@@ -11,8 +11,8 @@
 // RENDERER
 //===========================================
 
-Renderer::Renderer() :
-    active(System::renderCube)
+Renderer::Renderer(Render render) :
+    active(render)
 {
     
 }

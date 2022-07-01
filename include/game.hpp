@@ -12,7 +12,6 @@ struct Game
 {
     Game();
 
-    Renderer renderer;
     World world;
 
     float tPrev = 0.0f;

@@ -7,7 +7,7 @@
 
 struct FloorModel
 {
-    FloorModel(Renderer& renderer);
+    FloorModel();
 
     Renderer renderer;
     glm::mat4 model;
@@ -18,7 +18,7 @@ struct FloorModel
 
 struct CubeModel
 {
-    CubeModel(Renderer& renderer);
+    CubeModel();
 
     Renderer renderer;
     glm::mat4 model;

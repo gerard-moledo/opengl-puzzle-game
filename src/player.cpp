@@ -6,8 +6,8 @@
 #include "system.hpp"
 #include "world.hpp"
 
-Player::Player(Renderer& renderer) :
-    cube(renderer)
+Player::Player() :
+    cube()
 {
     cube.color = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
 }

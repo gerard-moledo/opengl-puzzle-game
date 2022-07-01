@@ -16,7 +16,7 @@
 
 struct World
 {
-    World(Renderer& renderer);
+    World();
 
     int width = 7;
     int height = 7;
@@ -29,8 +29,6 @@ struct World
     glm::mat4 view;
     glm::vec3 eyePolarPrev;
     glm::vec3 eyePolar;
-    
-    Renderer& renderer;
 
     glm::vec3 GetMouseRay(float mouseX, float mouseY);
     void Resize(int newWidth, int newHeight);

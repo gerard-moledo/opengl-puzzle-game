@@ -9,7 +9,7 @@
 
 struct Player
 {
-    Player(Renderer& renderer);
+    Player();
 
     State state = State::idle;
     

@@ -13,8 +13,8 @@
 
 struct Renderer
 {
-    Renderer();
-
+    Renderer(Render render);
+    
     Render active;
 
     void BindState();

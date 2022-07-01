@@ -3,8 +3,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-FloorModel::FloorModel(Renderer& renderer) :
-    renderer(renderer),
+FloorModel::FloorModel() :
+    renderer(System::renderFloor),
     model(glm::mat4(1.0f)),
     scale(glm::vec3(1.0f))
 {
@@ -13,8 +13,6 @@ FloorModel::FloorModel(Renderer& renderer) :
 
 void FloorModel::Draw(glm::mat4 worldTransform)
 {
-    renderer.active = System::renderFloor;
-    
     renderer.BindState();
 
     renderer.SetUniforms(worldTransform * model, glm::vec4(0.0f), 0, scale);
@@ -22,18 +20,16 @@ void FloorModel::Draw(glm::mat4 worldTransform)
     renderer.DrawBuffer();
 }
 
-CubeModel::CubeModel(Renderer& renderer) :
-    renderer(renderer),
+CubeModel::CubeModel() :
+    renderer(System::renderCube),
     model(glm::mat4(1.0f)),
     color(glm::vec4(1.0f))
 {
-
+    
 }
 
 void CubeModel::Draw(glm::mat4 worldTransform)
 {
-    renderer.active = System::renderCube;
-
     renderer.BindState();
 
     renderer.SetUniforms(worldTransform * model, color, 0, glm::vec3(1.0f));

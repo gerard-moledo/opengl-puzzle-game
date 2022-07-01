@@ -11,7 +11,7 @@ enum class BlockType { block, wall, goal };
 
 struct Block
 {
-    Block(Renderer& renderer, BlockType type, Vector2i cell);
+    Block(BlockType type, Vector2i cell);
 
     State state = State::idle;
 

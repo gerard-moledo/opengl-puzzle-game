@@ -38,7 +38,7 @@ void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
 
             if (!occupied)
             {
-                world->blocks.emplace_back(Block { world->renderer, BlockType::block, hitGrid });
+                world->blocks.emplace_back(Block { BlockType::block, hitGrid });
             }
         }
 
@@ -91,11 +91,10 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
     }
 }
 
-World::World(Renderer& renderer) :
-    renderer(renderer),
-    floor(renderer),
-    player(renderer),
-    blocks(0, Block(renderer, BlockType::goal, { 0, 0 })),
+World::World() :
+    floor(),
+    player(),
+    blocks(0, Block(BlockType::goal, { 0, 0 })),
     projection(glm::mat4(1.0f)),
     view(glm::mat4(1.0f)),
     eyePolarPrev(glm::vec3(0.0f)),

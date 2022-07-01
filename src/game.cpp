@@ -10,8 +10,7 @@
 void GameLoop(void* instance);
 
 Game::Game() :
-    renderer(),
-    world(renderer)
+    world()
 {
     
 }

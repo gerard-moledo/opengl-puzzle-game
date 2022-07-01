@@ -2,8 +2,8 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
-Block::Block(Renderer& renderer, BlockType type, Vector2i cell) :
-    cube(renderer),
+Block::Block(BlockType type, Vector2i cell) :
+    cube(),
     currentCell(cell),
     targetCell(cell),
     type(type)
