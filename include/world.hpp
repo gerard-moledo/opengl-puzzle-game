@@ -21,6 +21,8 @@ public:
 
     int width = 7;
     int height = 7;
+
+    Mode mode = Mode::play;
     
     FloorModel floor;
     Player player;

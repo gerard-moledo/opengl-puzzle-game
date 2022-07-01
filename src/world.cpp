@@ -7,8 +7,10 @@
 
 void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
 {
-    World* world = (World*)glfwGetWindowUserPointer(window);
+    World* world = (World*) glfwGetWindowUserPointer(window);
 
+    if (world->mode == Mode::play) return;
+    
     if (action == GLFW_PRESS)
     {
         double mouseX, mouseY;
@@ -78,6 +80,13 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
 {
     World* world = (World*) glfwGetWindowUserPointer(window);
 
+    if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
+    {
+        world->mode = world->mode == Mode::play ? Mode::edit : Mode::play;
+    }
+    
+    if (world->mode == Mode::play) return;
+    
     Vector2i resize = Vector2i { 0, 0 };
     
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)   resize.x = -2;
@@ -112,25 +121,29 @@ void World::Initialize()
     glfwSetWindowUserPointer(System::window, this);
     glfwSetMouseButtonCallback(System::window, glfwMouseCallback);
     glfwSetKeyCallback(System::window, glfwKeyCallback);
+
+    
 }
 
 void World::Update(float dt)
 {
     eyePolarPrev = eyePolar;
     
-    if (glfwGetKey(System::window, GLFW_KEY_J) == GLFW_PRESS)
-       eyePolar.x += -dt;
-    if (glfwGetKey(System::window, GLFW_KEY_L) == GLFW_PRESS)
-       eyePolar.x += dt;
-    if (glfwGetKey(System::window, GLFW_KEY_I) == GLFW_PRESS)
-       eyePolar.y = glm::clamp<float>(eyePolar.y + dt, -glm::half_pi<float>() + glm::epsilon<float>(), glm::half_pi<float>() - glm::epsilon<float>());
-    if (glfwGetKey(System::window, GLFW_KEY_K) == GLFW_PRESS)
-       eyePolar.y = glm::clamp<float>(eyePolar.y - dt, -glm::half_pi<float>() + glm::epsilon<float>(), glm::half_pi<float>() - glm::epsilon<float>());
-    if (glfwGetKey(System::window, GLFW_KEY_U) == GLFW_PRESS)
-        eyePolar.z += -dt * 50;
-    if (glfwGetKey(System::window, GLFW_KEY_O) == GLFW_PRESS)
-        eyePolar.z += dt * 50;
-
+    if (mode == Mode::edit)
+    {
+        if (glfwGetKey(System::window, GLFW_KEY_J) == GLFW_PRESS)
+            eyePolar.x += -dt;
+        if (glfwGetKey(System::window, GLFW_KEY_L) == GLFW_PRESS)
+            eyePolar.x += dt;
+        if (glfwGetKey(System::window, GLFW_KEY_I) == GLFW_PRESS)
+            eyePolar.y = glm::clamp<float>(eyePolar.y + dt, -glm::half_pi<float>() + glm::epsilon<float>(), glm::half_pi<float>() - glm::epsilon<float>());
+        if (glfwGetKey(System::window, GLFW_KEY_K) == GLFW_PRESS)
+            eyePolar.y = glm::clamp<float>(eyePolar.y - dt, -glm::half_pi<float>() + glm::epsilon<float>(), glm::half_pi<float>() - glm::epsilon<float>());
+        if (glfwGetKey(System::window, GLFW_KEY_U) == GLFW_PRESS)
+            eyePolar.z += -dt * 50;
+        if (glfwGetKey(System::window, GLFW_KEY_O) == GLFW_PRESS)
+            eyePolar.z += dt * 50;
+    }
 
 
     
