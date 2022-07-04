@@ -9,7 +9,7 @@
 #include "glad/glad.h"
 #include "glm/glm.hpp"
 
-#include "system.hpp"
+#include "render.hpp"
 
 class Renderer
 {

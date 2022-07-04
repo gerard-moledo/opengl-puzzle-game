@@ -29,4 +29,15 @@ public:
     void Draw(glm::mat4 worldTransform);
 };
 
+class Text
+{
+public:
+    Text();
+
+    Renderer renderer;
+    glm::mat4 model;
+
+    void Draw();
+};
+
 #endif

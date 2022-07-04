@@ -30,6 +30,7 @@ void Renderer::SetUniforms(glm::mat4 transform, glm::vec4 color, GLuint texture,
     glUniform4f(active.colorLocation, color.r, color.g, color.b, color.a);
     
     glActiveTexture(GL_TEXTURE0 + texture);
+    glBindTexture(GL_TEXTURE_2D, active.texture);
     glUniform1i(active.textureLocation, texture);
     glUniform2f(active.texScaleLocation, scale.x, scale.z);
 }

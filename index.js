@@ -194,7 +194,7 @@ Module['FS_createPath']("/", "Assets", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/Assets/cube.data", "start": 0, "end": 293}, {"filename": "/Assets/cube.fs", "start": 293, "end": 484}, {"filename": "/Assets/cube.vs", "start": 484, "end": 1118}, {"filename": "/Assets/floor.data", "start": 1118, "end": 1323}, {"filename": "/Assets/floor.fs", "start": 1323, "end": 1512}, {"filename": "/Assets/floor.vs", "start": 1512, "end": 1795}, {"filename": "/Assets/levels.data", "start": 1795, "end": 3229}, {"filename": "/Assets/Tile.png", "start": 3229, "end": 3404}], "remote_package_size": 3404});
+    loadPackage({"files": [{"filename": "/Assets/cube.data", "start": 0, "end": 293}, {"filename": "/Assets/cube.fs", "start": 293, "end": 484}, {"filename": "/Assets/cube.vs", "start": 484, "end": 1118}, {"filename": "/Assets/floor.data", "start": 1118, "end": 1323}, {"filename": "/Assets/Font.bmp", "start": 1323, "end": 197985}, {"filename": "/Assets/levels.data", "start": 197985, "end": 200745}, {"filename": "/Assets/text.data", "start": 200745, "end": 200950}, {"filename": "/Assets/texture.fs", "start": 200950, "end": 201139}, {"filename": "/Assets/texture.vs", "start": 201139, "end": 201422}, {"filename": "/Assets/Tile.png", "start": 201422, "end": 201597}], "remote_package_size": 201597});
 
   })();
 

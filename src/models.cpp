@@ -3,6 +3,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
+#include "system.hpp"
+
 FloorModel::FloorModel() :
     renderer(System::renderFloor),
     model(glm::mat4(1.0f)),
@@ -35,4 +37,16 @@ void CubeModel::Draw(glm::mat4 worldTransform)
     renderer.SetUniforms(worldTransform * model, color, 0, glm::vec3(1.0f));
 
     renderer.DrawBuffer();
+}
+
+Text::Text() :
+    renderer(System::renderText),
+    model(glm::mat4(1.0f))
+{
+    
+}
+
+void Text::Draw()
+{
+    
 }

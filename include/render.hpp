@@ -1,6 +1,8 @@
 #ifndef RENDER_H
 #define RENDER_H
 
+#include <string>
+
 #define GLFW_INCLUDE_NONE
 #include "glad/glad.h"
 #include "glfw/glfw3.h"
@@ -35,9 +37,11 @@ struct Render
     GLuint elementBuffer;
 
     GLuint texture;
-
+    std::vector<GLuint> subTextures;
+    
     BufferInfo bufferInfo;
     GLuint program;
+    
     GLint transformLocation;
     GLint colorLocation;
     GLint textureLocation;

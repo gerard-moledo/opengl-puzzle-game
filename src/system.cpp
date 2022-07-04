@@ -2,6 +2,8 @@
 
 #include <fstream>
 
+#include "stb_image.h"
+
 namespace System
 {
     int width = 800;
@@ -13,7 +15,8 @@ namespace System
 
     Render renderFloor;
     Render renderCube;
-
+    Render renderText;
+    
     std::vector<LevelInfo> levels;
     
     void Initialize()
@@ -28,12 +31,16 @@ namespace System
 
         gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
 
-        programMap.emplace(std::string("floor"), CreateShader("floor"));
+        programMap.emplace(std::string("texture"), CreateShader("texture"));
         programMap.emplace(std::string("cube"), CreateShader("cube"));
 
-        renderFloor = Render(ExtractBufferDataFromFile("floor"), programMap["floor"]);
+        renderFloor = Render(ExtractBufferDataFromFile("floor"), programMap["texture"]);
         renderCube = Render(ExtractBufferDataFromFile("cube"), programMap["cube"]);
+        renderText = Render(ExtractBufferDataFromFile("text"), programMap["texture"]);
 
+        GenerateFloorTexture(renderFloor);
+        GenerateGlyphTextures(renderText);
+        
         ExtractLevelDataFromFile(levels);
     }
 
@@ -93,6 +100,57 @@ namespace System
         filestream.close();
     }
 
+    void GenerateFloorTexture(Render& render)
+    {
+        std::string textureName = "Tile.png";
+        
+        int width, height, channelCount;
+        unsigned char* data = stbi_load(("Assets/" + textureName).c_str(), &width, &height, &channelCount, 0);
+        if (data)
+        {
+            glGenTextures(1, &render.texture);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, render.texture);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+        stbi_image_free(data);
+    }
+    
+    void GenerateGlyphTextures(Render& render)
+    {
+        std::string textureName = "Font.bmp";
+
+        int width, height, channelCount;
+        unsigned char* data = stbi_load(("Assets/" + textureName).c_str(), &width, &height, &channelCount, 0);
+        if (data)
+        {
+            render.subTextures.resize(64);
+            glGenTextures(64, render.subTextures.data());
+            glActiveTexture(GL_TEXTURE0);
+            
+            for (int cell = 0; cell < 64; cell++)
+            {
+                int xOffset = (cell % 8) * 32;
+                int yOffset = (cell / 8) * 32;
+
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+                
+                glBindTexture(GL_TEXTURE_2D, render.subTextures[cell]);
+                glTexSubImage2D(GL_TEXTURE_2D, 0, xOffset, yOffset, 32, 32, GL_RGB, GL_UNSIGNED_BYTE, data);
+                glGenerateMipmap(GL_TEXTURE_2D);
+            }
+        }
+        stbi_image_free(data);
+    }
+    
     BufferInfo ExtractBufferDataFromFile(std::string type)
     {
         BufferInfo data;

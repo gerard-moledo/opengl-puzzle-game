@@ -21,6 +21,7 @@ namespace System
     
     extern Render renderFloor;
     extern Render renderCube;
+    extern Render renderText;
 
     extern std::vector<LevelInfo> levels;
     
@@ -29,6 +30,9 @@ namespace System
     GLuint CreateShader(std::string filename);
     void ReadShaderFromFile(std::string& shader, std::string file);
 
+    void GenerateFloorTexture(Render& render);
+    void GenerateGlyphTextures(Render& render);
+    
     BufferInfo ExtractBufferDataFromFile(std::string type);
     void ExtractLevelDataFromFile(std::vector<LevelInfo>& levels);
     

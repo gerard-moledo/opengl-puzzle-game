@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <sstream>
 
+#include "system.hpp"
+
 void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
 {
     World* world = (World*) glfwGetWindowUserPointer(window);
