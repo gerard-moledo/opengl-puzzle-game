@@ -28,3 +28,16 @@ In 'Edit' mode:
 - Arrow keys to increase/decrease size of playing field
 - IJKL keys to rotate camera spherically about the origin
 - UO keys to zoom camera in/out
+
+Create your own levels
+----------------------
+Level data is stored in a text file (levels.data), and you can extract the text representation of levels by pressing 'Enter' at any state. It looks something like this:
+
+```
+# . . . . . . . . 
+. @ . . B . . o # 
+. . . . . . . . . 
+```
+This means you can create your own levels via the 'Edit' mode and extract the data for that level. On the web build, you can also add that level to the game by clicking the 'Add Level' button. Levels added this way won't persist between sessions, however.
+
+Thus far, the only way to "save" your level is to copy the extracted text data and store it somewhere. If you think you've made an interesting level, feel free to share it and perhaps it will be added to the game!
