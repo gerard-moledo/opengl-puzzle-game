@@ -15,7 +15,11 @@ namespace System
 
     Render renderFloor;
     Render renderCube;
-    Render renderText;
+    Render renderUI;
+
+    Texture textureFloor;
+    Texture textureButton;
+    Texture textureFont;
     
     std::vector<LevelInfo> levels;
     
@@ -23,23 +27,31 @@ namespace System
     {
         glfwInit();
 
-        window = glfwCreateWindow(width, height, "Puzzle", NULL, NULL);
+        window = glfwCreateWindow(width, height, "Puzzle", nullptr, nullptr);
 
         glfwSetWindowPos(window, 640, 320);
 
         glfwMakeContextCurrent(window);
-
         gladLoadGLES2Loader((GLADloadproc)glfwGetProcAddress);
+
+        glViewport(0, 0, System::width, System::height);
+        glEnable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        //    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
         programMap.emplace(std::string("texture"), CreateShader("texture"));
         programMap.emplace(std::string("cube"), CreateShader("cube"));
 
         renderFloor = Render(ExtractBufferDataFromFile("floor"), programMap["texture"]);
         renderCube = Render(ExtractBufferDataFromFile("cube"), programMap["cube"]);
-        renderText = Render(ExtractBufferDataFromFile("text"), programMap["texture"]);
+        renderUI = Render(ExtractBufferDataFromFile("ui"), programMap["texture"]);
 
-        GenerateFloorTexture(renderFloor);
-        GenerateGlyphTextures(renderText);
+        GenerateTexture(textureFloor, "Floor.png", GL_NEAREST);
+        GenerateTexture(textureButton, "Button.png", GL_LINEAR_MIPMAP_LINEAR);
+        GenerateTexture(textureFont, "Font.png", GL_NEAREST);
         
         ExtractLevelDataFromFile(levels);
     }
@@ -100,55 +112,23 @@ namespace System
         filestream.close();
     }
 
-    void GenerateFloorTexture(Render& render)
+    void GenerateTexture(Texture& texture, std::string textureName, int filtering)
     {
-        std::string textureName = "Tile.png";
-        
-        int width, height, channelCount;
-        unsigned char* data = stbi_load(("Assets/" + textureName).c_str(), &width, &height, &channelCount, 0);
-        if (data)
+        texture.data = stbi_load(("Assets/" + textureName).c_str(), &texture.width, &texture.height, &texture.channels, 0);
+        if (texture.data)
         {
-            glGenTextures(1, &render.texture);
+            glGenTextures(1, &texture.ID);
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, render.texture);
+            glBindTexture(GL_TEXTURE_2D, texture.ID);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.width, texture.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture.data);
             glGenerateMipmap(GL_TEXTURE_2D);
         }
-        stbi_image_free(data);
-    }
-    
-    void GenerateGlyphTextures(Render& render)
-    {
-        std::string textureName = "Font.bmp";
-
-        int width, height, channelCount;
-        unsigned char* data = stbi_load(("Assets/" + textureName).c_str(), &width, &height, &channelCount, 0);
-        if (data)
-        {
-            render.subTextures.resize(64);
-            glGenTextures(64, render.subTextures.data());
-            glActiveTexture(GL_TEXTURE0);
-            
-            for (int cell = 0; cell < 64; cell++)
-            {
-                int xOffset = (cell % 8) * 32;
-                int yOffset = (cell / 8) * 32;
-
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-                
-                glBindTexture(GL_TEXTURE_2D, render.subTextures[cell]);
-                glTexSubImage2D(GL_TEXTURE_2D, 0, xOffset, yOffset, 32, 32, GL_RGB, GL_UNSIGNED_BYTE, data);
-                glGenerateMipmap(GL_TEXTURE_2D);
-            }
-        }
-        stbi_image_free(data);
     }
     
     BufferInfo ExtractBufferDataFromFile(std::string type)
@@ -280,8 +260,20 @@ namespace System
         }
     }
     
+    void DestroyTexture(Texture& texture) 
+    {
+        if (texture.data)
+        {
+            stbi_image_free(texture.data);
+            texture.data = nullptr;
+        }
+    }
+
     void Quit()
     {
+        DestroyTexture(textureFloor);
+        DestroyTexture(textureButton);
+
         glfwDestroyWindow(window);
 
         glfwTerminate();

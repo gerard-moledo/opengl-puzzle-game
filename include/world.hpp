@@ -28,11 +28,15 @@ public:
     FloorModel floor;
     Player player;
     std::vector<Block> blocks;
+
+    std::vector<UI> uiElements;
     
     glm::mat4 projection;
     glm::mat4 view;
     glm::vec3 eyePolarPrev;
     glm::vec3 eyePolar;
+
+    glm::mat4 uiProjection;
 
     glm::vec3 GetMouseRay(float mouseX, float mouseY);
     void Resize(int newWidth, int newHeight);
@@ -44,6 +48,8 @@ public:
     void LoadLevel();
     void CopyLevel();
 
+    std::vector<UI> CreateText(std::string text);
+    
 private:
     void ModifyState();
     bool CheckBlockOnGoal(Block& block);

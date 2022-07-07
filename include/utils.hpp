@@ -39,6 +39,15 @@ struct Vector2i
     
 };
 
+struct Texture
+{
+    GLuint ID;
+    int width;
+    int height;
+    int channels;
+    unsigned char* data = nullptr;
+};
+
 struct LevelInfo
 {
     Vector2i size;

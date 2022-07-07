@@ -18,8 +18,8 @@ public:
     
     Render active;
 
-    void BindState();
-    void SetUniforms(glm::mat4 transform, glm::vec4 color, GLuint texture, glm::vec3 scale);
+    void BindState(GLuint texture);
+    void SetUniforms(glm::mat4 transform, glm::vec4 color, GLuint texture, glm::vec2 texOffset, glm::vec2 texScale);
     void DrawBuffer();
 };
 

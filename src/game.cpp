@@ -17,12 +17,6 @@ Game::Game() :
 
 void Game::Start()
 {
-    glViewport(0, 0, System::width, System::height);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
 #ifndef __EMSCRIPTEN__
     glfwSwapInterval(1);
 #endif

@@ -17,22 +17,26 @@ Renderer::Renderer(Render render) :
     
 }
 
-void Renderer::BindState()
+void Renderer::BindState(GLuint texture)
 {
     glBindVertexArray(active.vao);
     glUseProgram(active.program);
+    if (texture)
+    {
+        glBindTexture(GL_TEXTURE_2D, texture);
+    }
 }
 
-void Renderer::SetUniforms(glm::mat4 transform, glm::vec4 color, GLuint texture, glm::vec3 scale)
+void Renderer::SetUniforms(glm::mat4 transform, glm::vec4 color, GLuint textureUnit, glm::vec2 texOffset, glm::vec2 texScale)
 {
     glUniformMatrix4fv(active.transformLocation, 1, GL_FALSE, glm::value_ptr(transform));
 
     glUniform4f(active.colorLocation, color.r, color.g, color.b, color.a);
     
-    glActiveTexture(GL_TEXTURE0 + texture);
-    glBindTexture(GL_TEXTURE_2D, active.texture);
-    glUniform1i(active.textureLocation, texture);
-    glUniform2f(active.texScaleLocation, scale.x, scale.z);
+    glActiveTexture(GL_TEXTURE0 + textureUnit);
+    glUniform1i(active.samplerLocation, textureUnit);
+    glUniform2f(active.texOffsetLocation, texOffset.x, texOffset.y);
+    glUniform2f(active.texScaleLocation, texScale.x, texScale.y);
 }
 
 void Renderer::DrawBuffer()

@@ -35,16 +35,14 @@ struct Render
     GLuint vao;
     GLuint arrayBuffer;
     GLuint elementBuffer;
-
-    GLuint texture;
-    std::vector<GLuint> subTextures;
     
     BufferInfo bufferInfo;
     GLuint program;
     
     GLint transformLocation;
     GLint colorLocation;
-    GLint textureLocation;
+    GLint samplerLocation;
+    GLint texOffsetLocation;
     GLint texScaleLocation;
 };
 

@@ -125,14 +125,18 @@ World::World() :
     floor(),
     player(),
     blocks(0, Block(BlockType::goal, { 0, 0 })),
+    uiElements(0, UI(Vector2i(), 0.0f, Texture(), 0)),
     projection(glm::mat4(1.0f)),
     view(glm::mat4(1.0f)),
     eyePolarPrev(glm::vec3(0.0f)),
-    eyePolar(glm::vec3(0.0f))
+    eyePolar(glm::vec3(0.0f)),
+    uiProjection(glm::mat4(1.0f))
 {
-    projection = glm::perspective(glm::radians(45.0f), (float) System::width / System::height, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(45.0f), (float) System::width / System::height, 0.1f, 1000.0f);
 
     eyePolar = glm::vec3(0.0f, glm::radians(60.0f), 30.0f);
+
+    uiProjection = glm::ortho<float>(0, System::width, 0.0f, System::height, -100.0f, 100.0f);
     
     Resize(width, height);
 }
@@ -142,6 +146,12 @@ void World::Initialize()
     glfwSetWindowUserPointer(System::window, this);
     glfwSetMouseButtonCallback(System::window, glfwMouseCallback);
     glfwSetKeyCallback(System::window, glfwKeyCallback);
+
+    for (int level = 0; level < System::levels.size(); level++) 
+    {
+        uiElements.emplace_back(Vector2i{ 14 + 52 * level, System::height - 50 - 50 * (level / 15) }, 30.0f, System::textureButton, -1);
+        //uiElements.emplace_back(Vector2i{ 32 + 52 * level, System::height - 57 - 50 * (level / 15) }, 32.0f, System::textureFont, (level + 17) %);
+    }
 
     if (mode == Mode::play)
     {
@@ -314,7 +324,7 @@ void World::ModifyState()
         }
     }
 }
-
+ 
 void World::Render(float lag)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -327,11 +337,22 @@ void World::Render(float lag)
     glm::mat4 renderTransform = glm::mat4(1.0f);
     renderTransform = projection * view * renderTransform;
 
+    glEnable(GL_DEPTH_TEST);
+
     floor.Draw(renderTransform);
     player.Draw(renderTransform, lag);
     for (Block& block : blocks)
     {
         block.Draw(renderTransform, lag);
+    }
+
+    glm::mat4 uiTransform = glm::mat4(1.0f);
+    uiTransform = uiProjection * uiTransform;
+
+    glDisable(GL_DEPTH_TEST);
+    for (UI& ui : uiElements)
+    {
+        ui.Draw(uiTransform);
     }
 }
 
@@ -353,7 +374,7 @@ void World::Resize(int newWidth, int newHeight)
     floor.model = glm::translate(floor.model, glm::vec3(0.0f, -1.0f, 0.0f));
     floor.model = glm::scale(floor.model, glm::vec3((float)width, 0.0f, (float)height));
 
-    floor.scale = glm::vec3((float)width, 0.0f, (float)height);
+    floor.scale = glm::vec2((float)width, (float)height);
 }
 
 

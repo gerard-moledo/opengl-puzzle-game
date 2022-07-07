@@ -7,17 +7,18 @@
 
 FloorModel::FloorModel() :
     renderer(System::renderFloor),
+    texture(System::textureFloor),
     model(glm::mat4(1.0f)),
-    scale(glm::vec3(1.0f))
+    scale(glm::vec2(1.0f))
 {
     model = glm::translate(model, glm::vec3(0.0f, -1.0f, 0.0f));
 }
 
 void FloorModel::Draw(glm::mat4 worldTransform)
 {
-    renderer.BindState();
+    renderer.BindState(texture.ID);
 
-    renderer.SetUniforms(worldTransform * model, glm::vec4(0.0f), 0, scale);
+    renderer.SetUniforms(worldTransform * model, glm::vec4(0.0f), 0, glm::vec2(0.0f), scale);
 
     renderer.DrawBuffer();
 }
@@ -32,21 +33,36 @@ CubeModel::CubeModel() :
 
 void CubeModel::Draw(glm::mat4 worldTransform)
 {
-    renderer.BindState();
+    renderer.BindState(0);
 
-    renderer.SetUniforms(worldTransform * model, color, 0, glm::vec3(1.0f));
+    renderer.SetUniforms(worldTransform * model, color, 0, glm::vec2(0.0f), glm::vec2(1.0f));
 
     renderer.DrawBuffer();
 }
 
-Text::Text() :
-    renderer(System::renderText),
-    model(glm::mat4(1.0f))
+UI::UI(Vector2i position, float size, Texture tex, int glyph) :
+    renderer(System::renderUI),
+    texture(tex),
+    model(glm::mat4(1.0f)),
+    offset(glm::vec2(0.0f)),
+    scale(glm::vec2(1.0f)),
+    glyphIndex(glyph)
 {
-    
+    model = glm::translate(model, glm::vec3((float) position.x, (float) position.y, 0.0f));
+    model = glm::scale(model, glm::vec3((float) texture.width / texture.height, (float) 1.0f, 0.0f) * size);
+
+    if (glyph >= 0)
+    {
+        offset = glm::vec2(glyph % 8 * 32 / 256.0f, glyph / 8 * 32 / 256.0f);
+        scale = glm::vec2(32 / 256.0f);
+    }
 }
 
-void Text::Draw()
+void UI::Draw(glm::mat4 uiTransform)
 {
+    renderer.BindState(texture.ID);
+
+    renderer.SetUniforms(uiTransform * model, glm::vec4(1.0f), 0, offset, scale);
     
+    renderer.DrawBuffer();
 }
