@@ -18,7 +18,7 @@ Game::Game() :
 void Game::Start()
 {
 #ifndef __EMSCRIPTEN__
-    glfwSwapInterval(1);
+   // glfwSwapInterval(1);
 #endif
     
     world.Initialize();
