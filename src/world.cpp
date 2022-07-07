@@ -2,6 +2,9 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include <algorithm>
 #include <sstream>
@@ -115,9 +118,7 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
 
     if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
     {
-#ifndef __EMSCRIPTEN__
         world->CopyLevel();
-#endif
     }
 
     Vector2i resize = Vector2i { 0, 0 };
@@ -170,6 +171,69 @@ World::World() :
     
     Resize(width, height);
 }
+
+extern "C" {
+    void AddLevel(char* levelText)
+    {
+        printf("%s", levelText);
+        std::string levelString = levelText;
+
+        std::stringstream ss;
+        ss.str(levelString);
+        
+        LevelInfo info;
+
+        int row = 0, rows = 0;
+        int column = 0, columns = 0;
+        char cell;
+
+        ss >> cell >> cell >> cell >> cell;
+        while (ss >> cell)
+        {
+            printf("%c", cell);
+            if (cell == '-') break;
+            if (cell == '<')
+            {
+                ss >> cell >> cell >> cell >> cell;
+                
+                row++;
+                if (column > columns) columns = column;
+                column = 0;
+            }
+
+            Vector2i location { column, row };
+            
+            switch (cell)
+            {
+                case '@':
+                    info.playerStart = location;
+                    break;
+                case '#':
+                    info.blockData.emplace_back(std::pair<BlockType, Vector2i>(BlockType::wall, location));
+                    break;
+                case 'B':
+                    info.blockData.emplace_back(std::pair<BlockType, Vector2i>(BlockType::block, location));
+                    break;
+                case 'o':
+                    info.blockData.emplace_back(std::pair<BlockType, Vector2i>(BlockType::goal, location));
+                    break;
+            }
+
+            column++;
+        }
+        rows = row;
+
+        info.size = Vector2i { columns, rows };
+        info.playerStart = LevelToWorld(info.playerStart, info.size);
+        for (auto& data : info.blockData)
+        {
+            data.second = LevelToWorld(data.second, info.size);
+        }
+
+        System::levels.emplace_back(info);
+    }
+}
+
 
 void World::Initialize()
 {
@@ -255,8 +319,25 @@ void World::CopyLevel()
     }
     levelText += "\n\n-------------------------------------\n";
 
+#ifndef __EMSCRIPTEN__
     glfwSetClipboardString(System::window, levelText.c_str());
     printf("%s", levelText.c_str());
+#else
+    EM_ASM({
+        let body = document.querySelector("body");
+        if (!document.getElementById("paste"))
+        {
+            let p = document.createElement("p");
+            p.id = "paste";
+            body.appendChild(p);
+        }
+        let p = document.getElementById("paste");
+        let str = UTF8ToString($0);
+        str = str.replaceAll("\n", "<br>");
+        p.style = "font-family: Courier New;";
+        p.innerHTML = str;
+    }, levelText.c_str());
+#endif
 }
 
 std::vector<UI> World::CreateText(std::string text, Vector2i position, float size, glm::vec4 color)

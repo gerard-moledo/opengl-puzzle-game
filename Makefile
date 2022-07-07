@@ -22,7 +22,7 @@ ifeq ($(PLATFORM), 'desktop')
 	LINKS += -o program.exe
 else
 	LINKS += -s USE_GLFW=3 -s MAX_WEBGL_VERSION=2 -s MIN_WEBGL_VERSION=2 --preload-file Assets/ \
-			-o index.html --shell-file shell.html
+			-o index.html --shell-file shell.html -sEXPORTED_FUNCTIONS=_main,_AddLevel
 endif
 
 ifneq ($(PLATFORM), 'desktop')
