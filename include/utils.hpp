@@ -6,7 +6,8 @@
 constexpr float SPEED = 35;
 
 enum class Mode { play, edit };
-enum class State { idle, premove, moving, postmove };
+enum class GameState { onPlay, onLevelEnd };
+enum class MoveState { idle, premove, moving, postmove };
 enum class BlockType { block, wall, goal };
 
 struct Vector2i

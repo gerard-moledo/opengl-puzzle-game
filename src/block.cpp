@@ -16,7 +16,7 @@ void Block::Update(float dt)
 {
     worldPosPrev = worldPos;
 
-    if (state == State::moving)
+    if (state == MoveState::moving)
     {
         bool done = Move(dt);
 
@@ -25,7 +25,7 @@ void Block::Update(float dt)
             tMove = 0.0f;
             currentCell = targetCell;
 
-            state = State::postmove;
+            state = MoveState::postmove;
         }
     }
 }

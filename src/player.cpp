@@ -16,7 +16,7 @@ void Player::Update(float dt)
 {
     worldPosPrev = worldPos;
 
-    if (state == State::idle)
+    if (state == MoveState::idle)
     {
         ReceiveInput();
         
@@ -24,11 +24,11 @@ void Player::Update(float dt)
         {
             accelerating = true;
 
-            state = State::premove;
+            state = MoveState::premove;
         }
     }
     
-    if (state == State::moving)
+    if (state == MoveState::moving)
     {
         bool done = Move(dt);
 
@@ -38,7 +38,7 @@ void Player::Update(float dt)
             accelerating = false;
             currentCell = targetCell;
 
-            state = State::postmove;
+            state = MoveState::postmove;
         }
     }
 }

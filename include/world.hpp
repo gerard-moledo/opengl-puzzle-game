@@ -24,6 +24,7 @@ public:
     int height = 7;
 
     Mode mode = Mode::play;
+    GameState gameState = GameState::onPlay;
     
     FloorModel floor;
     Player player;
@@ -48,7 +49,7 @@ public:
     void LoadLevel();
     void CopyLevel();
 
-    std::vector<UI> CreateText(std::string text);
+    std::vector<UI> CreateText(std::string text, Vector2i position, float size, glm::vec4 color);
     
 private:
     void ModifyState();

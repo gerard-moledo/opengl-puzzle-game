@@ -36,7 +36,7 @@ public:
 class UI
 {
 public:
-    UI(Vector2i position, float size, Texture tex, int glyph);
+    UI(Vector2i position, glm::vec2 size, glm::vec4 tint, Texture tex, int glyph);
 
     Renderer renderer;
     Texture texture;
@@ -44,6 +44,7 @@ public:
     glm::mat4 model;
     glm::vec2 offset;
     glm::vec2 scale;
+    glm::vec4 color;
 
     int glyphIndex;
 

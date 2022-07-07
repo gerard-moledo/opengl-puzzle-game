@@ -12,7 +12,7 @@ class Player
 public:
     Player();
 
-    State state = State::idle;
+    MoveState state = MoveState::idle;
     
     glm::vec3 worldPosPrev { 0.0f, 0.0f, 0.0f };
     glm::vec3 worldPos { 0.0f, 0.0f, 0.0f };

@@ -12,7 +12,7 @@ class Block
 public:
     Block(BlockType type, Vector2i cell);
 
-    State state = State::idle;
+    MoveState state = MoveState::idle;
 
     bool onGoal = false;
     

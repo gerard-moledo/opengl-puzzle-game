@@ -88,15 +88,13 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
         world->mode = world->mode == Mode::play ? Mode::edit : Mode::play;
     }
 
-    if (key == GLFW_KEY_X && action == GLFW_PRESS)
+    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
     {
-        world->level = world->level == System::levels.size() ? 1 : world->level + 1;
-        world->LoadLevel();
-    }
-    if (key == GLFW_KEY_Z && action == GLFW_PRESS)
-    {
-        world->level = world->level == 1 ? System::levels.size() : world->level - 1;
-        world->LoadLevel();
+        if (world->gameState == GameState::onLevelEnd)
+        {
+            world->level = world->level == System::levels.size() ? 1 : world->level + 1;
+            world->LoadLevel();
+        }
     }
 
     if (world->mode == Mode::play) return;
@@ -121,11 +119,29 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
     }
 }
 
+void glfwScrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+    World* world = (World*) glfwGetWindowUserPointer(window);
+
+    if (world->mode == Mode::play) return;
+    
+    if (yOffset > 0)
+    {
+        world->level = world->level == 1 ? System::levels.size() : world->level - 1;
+        world->LoadLevel();
+    }
+    if (yOffset < 0)
+    {
+        world->level = world->level == System::levels.size() ? 1 : world->level + 1;
+        world->LoadLevel();
+    }
+}
+
 World::World() :
     floor(),
     player(),
     blocks(0, Block(BlockType::goal, { 0, 0 })),
-    uiElements(0, UI(Vector2i(), 0.0f, Texture(), 0)),
+    uiElements(0, UI(Vector2i(), glm::vec2(), glm::vec4(1.0f), Texture(), 0)),
     projection(glm::mat4(1.0f)),
     view(glm::mat4(1.0f)),
     eyePolarPrev(glm::vec3(0.0f)),
@@ -146,12 +162,14 @@ void World::Initialize()
     glfwSetWindowUserPointer(System::window, this);
     glfwSetMouseButtonCallback(System::window, glfwMouseCallback);
     glfwSetKeyCallback(System::window, glfwKeyCallback);
+    glfwSetScrollCallback(System::window, glfwScrollCallback);
 
-    for (int level = 0; level < System::levels.size(); level++) 
-    {
-        uiElements.emplace_back(Vector2i{ 14 + 52 * level, System::height - 50 - 50 * (level / 15) }, 30.0f, System::textureButton, -1);
-        //uiElements.emplace_back(Vector2i{ 32 + 52 * level, System::height - 57 - 50 * (level / 15) }, 32.0f, System::textureFont, (level + 17) %);
-    }
+    
+    // for (int level = 0; level < System::levels.size(); level++) 
+    // {
+    //     uiElements.emplace_back(Vector2i{ 14 + 52 * level, System::height - 50 - 50 * (level / 15) }, 30.0f, System::textureButton, -1);
+    //     //uiElements.emplace_back(Vector2i{ 32 + 52 * level, System::height - 57 - 50 * (level / 15) }, 32.0f, System::textureFont, (level + 17) %);
+    // }
 
     if (mode == Mode::play)
     {
@@ -162,7 +180,8 @@ void World::Initialize()
 void World::LoadLevel()
 {
     blocks.clear();
-
+    uiElements.clear();
+    
     Vector2i playerStart = System::levels[level - 1].playerStart;
     player.currentCell = playerStart;
     player.targetCell = playerStart;
@@ -174,6 +193,18 @@ void World::LoadLevel()
     }
 
     Resize(System::levels[level - 1].size.x, System::levels[level - 1].size.y);
+
+    if (level >= 10)
+    {
+        uiElements.emplace_back(Vector2i { 10 + 40 * 0, System::height - 100 }, glm::vec2(100.0f), glm::vec4(1.0f), System::textureFont, (level / 10) + 16);
+        uiElements.emplace_back(Vector2i { 10 + 40 * 1, System::height - 100 }, glm::vec2(100.0f), glm::vec4(1.0f), System::textureFont, (level % 10) + 16);
+    }
+    else
+    {
+        uiElements.emplace_back(Vector2i { 10 + 40, System::height - 100 }, glm::vec2(100.0f), glm::vec4(1.0f), System::textureFont, level + 16);
+    }
+
+    gameState = GameState::onPlay;
 }
 
 void World::CopyLevel()
@@ -213,6 +244,18 @@ void World::CopyLevel()
     printf("%s", levelText.c_str());
 }
 
+std::vector<UI> World::CreateText(std::string text, Vector2i position, float size, glm::vec4 color)
+{
+    std::vector<UI> uiText;
+    
+    for (int letter = 0; letter < text.length(); letter++)
+    {
+        uiText.emplace_back(position + Vector2i { letter * (int) size / 3, 0 }, glm::vec2(size), color, System::textureFont, text[letter] + 32);
+    }
+
+    return uiText;
+}
+
 void World::Update(float dt)
 {
     eyePolarPrev = eyePolar;
@@ -234,25 +277,50 @@ void World::Update(float dt)
     }
 
 
-    
-    player.Update(dt);
-
-    for (Block& block : blocks)
+    if (gameState == GameState::onPlay)
     {
-        block.Update(dt);
+        player.Update(dt);
+
+        for (Block& block : blocks)
+        {
+            block.Update(dt);
+        }
+
+        ModifyState();
+
+        if (std::all_of(blocks.begin(), blocks.end(), [&](Block block) { return block.type != BlockType::block || block.onGoal; }))
+        {
+            gameState = GameState::onLevelEnd;
+
+            std::vector<UI> completeText = CreateText("LEVEL COMPLETE!", Vector2i { 150, System::height / 2 }, 100.0f, glm::vec4(1.0f, 0.9f, 0.0f, 1.0f));
+            std::vector<UI> nextLevelText = CreateText("SPACE TO CONTINUE", Vector2i { 230, System::height / 2 - 100 }, 60.0f, glm::vec4(1.0f));
+            UI backdrop = UI(Vector2i { 130, System::height / 2 - 85 }, glm::vec2(540.0f, 200.0f), glm::vec4(0.7f), System::textureButton, -1);
+
+            uiElements.emplace_back(backdrop);
+            uiElements.insert(uiElements.end(), completeText.begin(), completeText.end());
+            uiElements.insert(uiElements.end(), nextLevelText.begin(), nextLevelText.end());
+        }
     }
-    
-    ModifyState();
+
+    if (gameState == GameState::onLevelEnd)
+    {
+        player.worldPosPrev = player.worldPos;
+
+        for (Block& block : blocks)
+        {
+            block.worldPosPrev = block.worldPos;
+        }
+    }
 }
 
 void World::ModifyState()
 {
-    if (player.state == State::premove || player.state == State::postmove)
+    if (player.state == MoveState::premove || player.state == MoveState::postmove)
     {
         if (glm::abs(player.currentCell.x + player.direction.x) > width / 2 || 
             glm::abs(player.currentCell.y + player.direction.y) > height / 2)
         {
-            player.state = State::idle;
+            player.state = MoveState::idle;
         }
         for (Block& block : blocks)
         {
@@ -260,17 +328,17 @@ void World::ModifyState()
             
             if (player.currentCell + player.direction == block.currentCell)
             {
-                if (player.state == State::premove)
+                if (player.state == MoveState::premove)
                 {
-                    player.state = State::idle;
+                    player.state = MoveState::idle;
                 }
-                if (player.state == State::postmove)
+                if (player.state == MoveState::postmove)
                 {
-                    player.state = State::idle;
+                    player.state = MoveState::idle;
 
                     if (block.type == BlockType::block && !block.onGoal)
                     {
-                        block.state = State::postmove;
+                        block.state = MoveState::postmove;
                         block.direction = player.direction;
                     }
                 }
@@ -278,21 +346,21 @@ void World::ModifyState()
             }
         }
 
-        if (player.state == State::premove || player.state == State::postmove)
+        if (player.state == MoveState::premove || player.state == MoveState::postmove)
         {
-            player.state = State::moving;
+            player.state = MoveState::moving;
             player.targetCell = player.currentCell + player.direction;
         }
     }
 
     for (Block& blockActive : blocks)
     {
-        if (blockActive.state == State::postmove)
+        if (blockActive.state == MoveState::postmove)
         {   
             if (glm::abs(blockActive.currentCell.x + blockActive.direction.x) > width / 2 ||
                 glm::abs(blockActive.currentCell.y + blockActive.direction.y) > height / 2)
             {
-                blockActive.state = State::idle;
+                blockActive.state = MoveState::idle;
                 blockActive.onGoal = CheckBlockOnGoal(blockActive);
                 continue;
             }
@@ -303,12 +371,12 @@ void World::ModifyState()
                 
                 if (blockActive.currentCell + blockActive.direction == blockChecked.currentCell)
                 {
-                    blockActive.state = State::idle;
+                    blockActive.state = MoveState::idle;
                     blockActive.onGoal = CheckBlockOnGoal(blockActive);
                     
                     if (blockChecked.type == BlockType::block && !blockChecked.onGoal)
                     {
-                        blockChecked.state = State::postmove;
+                        blockChecked.state = MoveState::postmove;
                         blockChecked.direction = blockActive.direction;
                     }
 
@@ -316,10 +384,10 @@ void World::ModifyState()
                 }
             }
 
-            if (blockActive.state == State::postmove)
+            if (blockActive.state == MoveState::postmove)
             {
                 blockActive.targetCell = blockActive.currentCell + blockActive.direction;
-                blockActive.state = State::moving;
+                blockActive.state = MoveState::moving;
             }
         }
     }
@@ -376,8 +444,6 @@ void World::Resize(int newWidth, int newHeight)
 
     floor.scale = glm::vec2((float)width, (float)height);
 }
-
-
 
 glm::vec3 World::GetMouseRay(float mouseX, float mouseY)
 {
