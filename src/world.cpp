@@ -61,7 +61,7 @@ void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
 
         if (button == GLFW_MOUSE_BUTTON_MIDDLE)
         {
-            if (std::all_of(world->blocks.begin(), world->blocks.end(), [&](Block block) { return block.currentCell != hitGrid; }))
+            if (std::all_of(world->blocks.begin(), world->blocks.end(), [&](Block& block) { return block.currentCell != hitGrid; }))
             {
                 world->player.currentCell = hitGrid;
                 world->player.targetCell = hitGrid;
@@ -97,7 +97,7 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
         }
         if (world->mode == Mode::play)
         {
-            auto itEdit = std::find_if(world->uiElements.begin(), world->uiElements.end(), [](UI ui) { return ui.glyphIndex == (32 + 5); });
+            auto itEdit = std::find_if(world->uiElements.begin(), world->uiElements.end(), [&](UI& ui) { return ui.glyphIndex == (32 + 5) && ui.color == glm::vec4(0.0f, 0.5f, 1.0f, 1.0f); });
             world->uiElements.erase(itEdit, itEdit + 9);
         }
     }
@@ -265,7 +265,7 @@ std::vector<UI> World::CreateText(std::string text, Vector2i position, float siz
     
     for (int letter = 0; letter < text.length(); letter++)
     {
-        uiText.emplace_back(position + Vector2i { letter * (int) size / 3, 0 }, glm::vec2(size), color, System::textureFont, text[letter] + 32);
+        uiText.emplace_back(position + Vector2i { letter * (int) size / 3, 0 }, glm::vec2(size), color, System::textureFont, text[letter] - 32);
     }
 
     return uiText;
