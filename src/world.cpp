@@ -89,6 +89,17 @@ void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int 
     if (key == GLFW_KEY_TAB && action == GLFW_PRESS)
     {
         world->mode = world->mode == Mode::play ? Mode::edit : Mode::play;
+        if (world->mode == Mode::edit)
+        {
+            std::vector<UI> editText = world->CreateText("EDIT MODE", Vector2i { 20, System::height - 120 }, 40.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+
+            world->uiElements.insert(world->uiElements.end(), editText.begin(), editText.end());
+        }
+        if (world->mode == Mode::play)
+        {
+            auto itEdit = std::find_if(world->uiElements.begin(), world->uiElements.end(), [](UI ui) { return ui.glyphIndex == (32 + 5); });
+            world->uiElements.erase(itEdit, itEdit + 9);
+        }
     }
 
     if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
@@ -167,13 +178,6 @@ void World::Initialize()
     glfwSetKeyCallback(System::window, glfwKeyCallback);
     glfwSetScrollCallback(System::window, glfwScrollCallback);
 
-    
-    // for (int level = 0; level < System::levels.size(); level++) 
-    // {
-    //     uiElements.emplace_back(Vector2i{ 14 + 52 * level, System::height - 50 - 50 * (level / 15) }, 30.0f, System::textureButton, -1);
-    //     //uiElements.emplace_back(Vector2i{ 32 + 52 * level, System::height - 57 - 50 * (level / 15) }, 32.0f, System::textureFont, (level + 17) %);
-    // }
-
     if (mode == Mode::play)
     {
         LoadLevel();
@@ -208,6 +212,13 @@ void World::LoadLevel()
         uiElements.emplace_back(Vector2i { 10 + 40, System::height - 100 }, glm::vec2(100.0f), glm::vec4(1.0f), System::textureFont, level + 16);
     }
 
+    if (mode == Mode::edit)
+    {
+        std::vector<UI> editText = CreateText("EDIT MODE", Vector2i { 20, System::height - 120 }, 40.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+
+        uiElements.insert(uiElements.end(), editText.begin(), editText.end());
+    }
+    
     gameState = GameState::onPlay;
 }
 
