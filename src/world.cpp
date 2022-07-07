@@ -30,42 +30,45 @@ void glfwMouseCallback(GLFWwindow* window, int button, int action, int mods)
 
         if (button == GLFW_MOUSE_BUTTON_LEFT)
         {
-            bool occupied = false;
-            for (Block& block : world->blocks)
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT))
             {
-                if (block.currentCell == hitGrid)
+                if (std::all_of(world->blocks.begin(), world->blocks.end(), [&](Block block) { return block.currentCell != hitGrid; }))
                 {
-                    block.type = (BlockType) ( ((int) block.type + 1) % 3);
-
-                    occupied = true;
+                    world->player.currentCell = hitGrid;
+                    world->player.targetCell = hitGrid;
+                    world->player.worldPos = glm::vec3(hitGrid.x, 0.0f, hitGrid.y);
                 }
             }
-
-            if (!occupied)
+            else
             {
-                world->blocks.emplace_back(Block { BlockType::block, hitGrid });
+                bool occupied = false;
+                for (Block& block : world->blocks)
+                {
+                    if (block.currentCell == hitGrid)
+                    {
+                        block.type = (BlockType)(((int)block.type + 1) % 3);
+
+                        occupied = true;
+                    }
+                }
+
+                if (!occupied)
+                {
+                    world->blocks.emplace_back(Block { BlockType::block, hitGrid });
+                }
             }
         }
 
         if (button == GLFW_MOUSE_BUTTON_MIDDLE)
         {
-            bool occupied = false;
-            for (Block& block : world->blocks)
-            {
-                if (block.currentCell == hitGrid)
-                {
-                    occupied = true;
-                }
-            }
-
-            if (!occupied)
+            if (std::all_of(world->blocks.begin(), world->blocks.end(), [&](Block block) { return block.currentCell != hitGrid; }))
             {
                 world->player.currentCell = hitGrid;
                 world->player.targetCell = hitGrid;
                 world->player.worldPos = glm::vec3(hitGrid.x, 0.0f, hitGrid.y);
             }
         }
-        
+
         if (button == GLFW_MOUSE_BUTTON_RIGHT)
         {
             auto begin = world->blocks.begin();
@@ -186,6 +189,7 @@ void World::LoadLevel()
     player.currentCell = playerStart;
     player.targetCell = playerStart;
     player.worldPos = glm::vec3(playerStart.x, 0.0f, playerStart.y);
+    player.state = MoveState::idle;
 
     for (auto& data : System::levels[level - 1].blockData)
     {
