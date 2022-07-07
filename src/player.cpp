@@ -23,7 +23,8 @@ void Player::Update(float dt)
         if (direction != Vector2i { 0, 0 })
         {
             accelerating = true;
-
+            tMove = 0.0f;
+            
             state = MoveState::premove;
         }
     }
