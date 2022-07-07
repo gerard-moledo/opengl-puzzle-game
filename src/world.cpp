@@ -292,7 +292,7 @@ void World::Update(float dt)
 
         ModifyState();
 
-        if (std::all_of(blocks.begin(), blocks.end(), [&](Block block) { return block.type != BlockType::block || block.onGoal; }))
+        if (std::count_if(blocks.begin(), blocks.end(), [&](Block block) { return block.onGoal; }) == std::count_if(blocks.begin(), blocks.end(), [&](Block block) { return block.type == BlockType::goal; }) && mode == Mode::play)
         {
             gameState = GameState::onLevelEnd;
 
