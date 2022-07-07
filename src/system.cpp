@@ -50,7 +50,7 @@ namespace System
         renderUI = Render(ExtractBufferDataFromFile("ui"), programMap["texture"]);
 
         GenerateTexture(textureFloor, "Floor.png", GL_NEAREST);
-        GenerateTexture(textureButton, "Button.png", GL_LINEAR_MIPMAP_LINEAR);
+        GenerateTexture(textureButton, "Button.png", GL_NEAREST);
         GenerateTexture(textureFont, "Font.png", GL_NEAREST);
         
         ExtractLevelDataFromFile(levels);
