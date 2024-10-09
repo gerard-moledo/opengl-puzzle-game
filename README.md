@@ -1,4 +1,4 @@
-# Block Block 3D
+# SokobanGL
 Sokoban-based puzzle game made for OpenGL practice.
 
 WIP playable at this repository's Github Pages page: https://gerard-moledo.github.io/opengl-puzzle-game/
